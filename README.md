@@ -1,26 +1,30 @@
 # StockPulse Analytics
 
-A Streamlit dashboard for inventory stock-take variance analysis. Upload a
-stock-take file (CSV or Excel) with expected vs. counted quantities and get
-variance analysis, statistical anomaly detection, and interactive charts.
+A Streamlit dashboard for inventory stock-take variance analysis, loss
+prevention, and AI-written executive briefings. Upload a stock-take file
+(CSV or Excel) with expected vs. counted quantities and get variance analysis,
+shrinkage intelligence, multi-period trends, statistical anomaly detection,
+and a manager-ready briefing drafted by Claude.
 
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![Streamlit](https://img.shields.io/badge/streamlit-app-E8A03D)
 
 ## Features
 
-- **File upload** — CSV or Excel, with column validation
 - **Variance analysis** — quantity, percentage, and value variance per line item
-- **Anomaly detection** — statistical outliers via the 1.5×IQR rule on value variance
-- **Interactive dashboard** — variance by category and location, accuracy donut,
-  largest discrepancies
-- **Filters** — by category, location, count date, and anomaly status
-- **Export** — download the filtered, processed dataset as CSV
-- **Sample data** — a 150-row synthetic dataset is bundled so the app works out of the box
+- **Shrinkage intelligence** — separates shortages (loss/theft/spoilage) from
+  overages (receiving/counting errors) and puts a dollar figure on each
+- **Multi-period trends** — accuracy and value-at-risk over time, plus a
+  "recurring shortage products" table that flags items short across multiple
+  counts (the strongest genuine-shrinkage signal)
+- **Anomaly detection** — statistical outliers via the 1.5xIQR rule
+- **AI executive briefing** — Claude reads the *computed statistics* (never raw
+  rows) and drafts findings + prioritised recommendations, downloadable as
+  Markdown, plus a free-text Q&A box
+- **Interactive dashboard** — six tabs, filters by category/location/date/anomaly
+- **Sample data** bundled so the app works out of the box
 
 ## Expected data format
-
-Your file needs these columns:
 
 | Column          | Type    | Description                          |
 |-----------------|---------|--------------------------------------|
@@ -33,7 +37,8 @@ Your file needs these columns:
 | `unit_cost`     | number  | Cost per unit                        |
 | `count_date`    | date    | Date of the stock take               |
 
-A working example lives in `sample_data.csv`.
+A working example lives in `sample_data.csv`. Multi-period features light up
+when the file contains more than one `count_date`.
 
 ## Run locally
 
@@ -48,7 +53,24 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The app opens at http://localhost:8501.
+## Enabling the AI briefing
+
+The AI tab needs an Anthropic API key. The app looks for it in Streamlit
+secrets first, then the `ANTHROPIC_API_KEY` environment variable.
+
+**Locally:**
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."   # Windows: set ANTHROPIC_API_KEY=...
+streamlit run app.py
+```
+
+**On Streamlit Community Cloud:** open your app, click the three-dot menu >
+**Settings** > **Secrets**, and add:
+```toml
+ANTHROPIC_API_KEY = "sk-ant-..."
+```
+Save; the app restarts with AI features enabled. Get a key from
+console.anthropic.com. The rest of the dashboard works without a key.
 
 ## Tests
 
@@ -58,44 +80,41 @@ pytest
 
 ## Deploy to Streamlit Community Cloud
 
-1. Push this repo to GitHub (see below).
-2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
-3. Click **New app**, pick this repo, set the main file to `app.py`, and deploy.
-
-No secrets are required — the app runs entirely on uploaded/sample data.
-
-## Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: StockPulse Analytics"
-git branch -M main
-git remote add origin <your-new-github-repo-url>
-git push -u origin main
-```
+1. Push this repo to GitHub.
+2. Go to share.streamlit.io, sign in with GitHub.
+3. **New app**, pick the repo, main file `app.py`, deploy.
+4. (Optional) add `ANTHROPIC_API_KEY` under Settings > Secrets for the AI tab.
 
 ## Project structure
 
 ```
 stockpulse-analytics/
-├── app.py               # Streamlit UI
-├── analytics.py         # Variance + anomaly logic (pure pandas)
+├── app.py               # Streamlit UI (six tabs)
+├── analytics.py         # Variance, shrinkage & trend logic (pure pandas)
+├── ai_analyst.py        # Anthropic-powered briefing + Q&A
 ├── test_analytics.py    # Unit tests
 ├── sample_data.csv      # 150-row synthetic dataset
 ├── requirements.txt
 ├── .gitignore
-├── .streamlit/
-│   └── config.toml      # Theme
+├── .streamlit/config.toml
 └── README.md
 ```
 
 ## How the numbers work
 
-- **Quantity variance** = `counted_qty − expected_qty`
-- **Percentage variance** = `qty_variance / expected_qty × 100` (0 when expected is 0)
-- **Value variance** = `qty_variance × unit_cost`
-- **Anomaly** = value variance below `Q1 − 1.5×IQR` or above `Q3 + 1.5×IQR`
+- **Quantity variance** = `counted_qty - expected_qty`
+- **Percentage variance** = `qty_variance / expected_qty x 100` (0 when expected is 0)
+- **Value variance** = `qty_variance x unit_cost`
+- **Shrinkage** = summed value of rows where counted < expected (a loss)
+- **Recurring offender** = a product short in 2+ distinct count dates
+- **Anomaly** = value variance outside `Q1 - 1.5xIQR` .. `Q3 + 1.5xIQR`
+
+## Grounding the AI
+
+The AI layer is deliberately fed a compact JSON summary of the *computed*
+statistics — totals, per-category and per-location aggregates, the trend
+table, and the top-ten discrepancies — never the raw rows. This keeps the
+model anchored to real figures and avoids invented SKUs or numbers.
 
 ## License
 

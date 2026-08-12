@@ -72,3 +72,50 @@ def test_empty_summary():
     m = summary_metrics(empty)
     assert m["records"] == 0
     assert m["accuracy"] == 0.0
+
+
+# ---- v2: shrinkage & trend tests ---------------------------------------- #
+
+def _multi_period_frame():
+    import pandas as pd
+    rows = []
+    for date in ["2026-06-01", "2026-07-01", "2026-08-01"]:
+        rows += [
+            {"sku": "A", "product_name": "leaky", "category": "X", "location": "W1",
+             "expected_qty": 100, "counted_qty": 90, "unit_cost": 10.0, "count_date": date},
+            {"sku": "B", "product_name": "fine", "category": "Y", "location": "W2",
+             "expected_qty": 50, "counted_qty": 50, "unit_cost": 5.0, "count_date": date},
+        ]
+    return pd.DataFrame(rows)
+
+
+def test_shrinkage_metrics_splits_loss_and_surplus():
+    from analytics import compute_variance, shrinkage_metrics
+    df = compute_variance(_frame())
+    s = shrinkage_metrics(df)
+    # Row A is short (-$100), rows C/D are over.
+    assert s["shrinkage_value"] < 0
+    assert s["overage_value"] > 0
+    assert 0 <= s["shortage_rate"] <= 100
+
+
+def test_has_multiple_periods():
+    from analytics import compute_variance, has_multiple_periods
+    assert has_multiple_periods(compute_variance(_multi_period_frame())) is True
+    assert has_multiple_periods(compute_variance(_frame())) is False
+
+
+def test_accuracy_trend_is_chronological():
+    from analytics import compute_variance, accuracy_trend
+    t = accuracy_trend(compute_variance(_multi_period_frame()))
+    assert list(t["count_date"]) == sorted(t["count_date"])
+    assert len(t) == 3
+
+
+def test_recurring_offenders_flags_persistent_shortage():
+    from analytics import compute_variance, recurring_offenders
+    ro = recurring_offenders(compute_variance(_multi_period_frame()))
+    # "leaky" is short in all 3 periods; "fine" never is.
+    assert "leaky" in set(ro["product_name"])
+    assert "fine" not in set(ro["product_name"])
+    assert int(ro.loc[ro["product_name"] == "leaky", "periods_short"].iloc[0]) == 3
