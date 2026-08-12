@@ -19,12 +19,16 @@ import os
 import pandas as pd
 import requests
 
-# Gemini model + endpoint. If Google changes model names, update MODEL only.
-MODEL = "gemini-1.5-flash"
+# Gemini model + endpoint. If Google changes model names, update MODEL — or the
+# code will auto-discover a working model via list_models() as a fallback.
+MODEL = "gemini-2.5-flash"
+FALLBACK_MODELS = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-3.6-flash",
+                   "gemini-2.5-flash-lite", "gemini-2.0-flash"]
 ENDPOINT = (
     "https://generativelanguage.googleapis.com/v1beta/models/"
     "{model}:generateContent"
 )
+LIST_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models"
 TIMEOUT = 45
 
 
@@ -105,23 +109,62 @@ REPORT_INSTRUCTIONS = (
 )
 
 
+def _discover_model(api_key: str) -> str | None:
+    """Ask Google which models exist and pick a suitable flash model."""
+    try:
+        resp = requests.get(LIST_ENDPOINT, params={"key": api_key}, timeout=TIMEOUT)
+        if resp.status_code != 200:
+            return None
+        models = resp.json().get("models", [])
+        # Keep those that support generateContent.
+        usable = [
+            m["name"].split("/")[-1]
+            for m in models
+            if "generateContent" in m.get("supportedGenerationMethods", [])
+        ]
+        # Prefer a 'flash' text model; avoid image/audio/tts/embedding variants.
+        def ok(n): 
+            return "flash" in n and not any(
+                x in n for x in ("image", "audio", "tts", "embedding", "vision", "live"))
+        for pref in FALLBACK_MODELS:
+            if pref in usable:
+                return pref
+        flashes = [n for n in usable if ok(n)]
+        if flashes:
+            return sorted(flashes)[-1]  # newest-ish by name
+        return usable[0] if usable else None
+    except requests.RequestException:
+        return None
+
+
+def _post(model: str, api_key: str, payload: dict) -> requests.Response:
+    url = ENDPOINT.format(model=model)
+    return requests.post(url, params={"key": api_key}, json=payload, timeout=TIMEOUT)
+
+
 def _call_gemini(api_key: str, system: str, user: str, max_tokens: int) -> str:
-    """Low-level Gemini REST call. Raises RuntimeError with a clear message."""
-    url = ENDPOINT.format(model=MODEL)
+    """Low-level Gemini REST call with model auto-discovery. Raises RuntimeError."""
     payload = {
         "system_instruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": user}]}],
         "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.4},
     }
+
     try:
-        resp = requests.post(
-            url, params={"key": api_key}, json=payload, timeout=TIMEOUT
-        )
+        resp = _post(MODEL, api_key, payload)
     except requests.RequestException as e:
         raise RuntimeError(f"Network error contacting Gemini: {e}") from e
 
+    # If the model name is wrong (404), discover a working one and retry once.
+    if resp.status_code == 404:
+        alt = _discover_model(api_key)
+        if alt:
+            try:
+                resp = _post(alt, api_key, payload)
+            except requests.RequestException as e:
+                raise RuntimeError(f"Network error contacting Gemini: {e}") from e
+
     if resp.status_code != 200:
-        # Surface Google's error message so the user can act on it.
         detail = ""
         try:
             detail = resp.json().get("error", {}).get("message", "")
@@ -136,7 +179,6 @@ def _call_gemini(api_key: str, system: str, user: str, max_tokens: int) -> str:
         parts = data["candidates"][0]["content"]["parts"]
         return "".join(p.get("text", "") for p in parts).strip()
     except (KeyError, IndexError):
-        # e.g. blocked content or an empty candidate.
         raise RuntimeError(
             "Gemini returned no usable text. It may have blocked the request or "
             "hit a token limit. Try again or shorten the question."
