@@ -17,12 +17,15 @@ import streamlit as st
 from analytics import (
     REQUIRED_COLUMNS,
     accuracy_trend,
+    benchmark_by_dimension,
     compute_variance,
     detect_anomalies,
     has_multiple_periods,
     recurring_offenders,
     shrinkage_by_dimension,
     shrinkage_metrics,
+    shrinkage_trajectory,
+    stockout_risk,
     summary_metrics,
     top_discrepancies,
     variance_by_dimension,
@@ -287,8 +290,8 @@ st.divider()
 # --------------------------------------------------------------------------- #
 # Tabs
 # --------------------------------------------------------------------------- #
-tab_overview, tab_trends, tab_shrink, tab_anoms, tab_ai, tab_data = st.tabs(
-    ["Overview", "Trends", "Shrinkage", "Anomalies", "AI Briefing", "Data"]
+tab_overview, tab_trends, tab_shrink, tab_ops, tab_anoms, tab_ai, tab_data = st.tabs(
+    ["Overview", "Trends", "Shrinkage", "Operations", "Anomalies", "AI Briefing", "Data"]
 )
 
 # ---- Overview ------------------------------------------------------------- #
@@ -403,6 +406,94 @@ with tab_shrink:
             st.plotly_chart(bar(sbc, "category", "shrinkage_value",
                                 "Shortage value ($)", height=300), use_container_width=True)
 
+# ---- Operations ----------------------------------------------------------- #
+with tab_ops:
+    st.subheader("Shrinkage benchmark")
+    st.caption("Fresh-meat retail typically runs 2-5% shrink. Shops and categories "
+               "are graded green (under 3%), amber (3-5%), or red (over 5%).")
+
+    bench_amber, bench_red = 3.0, 5.0
+    status_color = {"green": GAIN, "amber": BRASS, "red": LOSS}
+    status_word = {"green": "On target", "amber": "Watch", "red": "Investigate"}
+
+    def status_row(df_bench, dim_label):
+        for _, r in df_bench.iterrows():
+            col = status_color[r["status"]]
+            st.markdown(
+                f"<div style='display:flex;align-items:center;gap:0.8rem;"
+                f"padding:0.5rem 0;border-bottom:1px solid {RULE};'>"
+                f"<span style='width:9px;height:9px;border-radius:50%;"
+                f"background:{col};display:inline-block;flex:none;'></span>"
+                f"<span style='flex:1;font-weight:500;'>{r[dim_label]}</span>"
+                f"<span style='font-family:IBM Plex Mono,monospace;color:{col};"
+                f"font-weight:600;'>{r['shrinkage_pct']:.1f}%</span>"
+                f"<span style='font-family:IBM Plex Mono,monospace;color:{MUTE};"
+                f"font-size:0.8rem;width:110px;text-align:right;'>"
+                f"${abs(r['shrinkage_value']):,.0f} lost</span>"
+                f"<span style='color:{col};font-size:0.78rem;width:90px;"
+                f"text-align:right;font-weight:600;'>{status_word[r['status']]}</span>"
+                f"</div>", unsafe_allow_html=True)
+
+    bcol, ccol = st.columns(2)
+    with bcol:
+        st.markdown("**By shop**")
+        status_row(benchmark_by_dimension(view, "location", bench_amber, bench_red), "location")
+    with ccol:
+        st.markdown("**By category**")
+        status_row(benchmark_by_dimension(view, "category", bench_amber, bench_red), "category")
+
+    st.divider()
+    st.subheader("Worsening products")
+    st.caption("Products whose losses are growing across the count dates — live, "
+               "accelerating problems, ranked by how much worse they've become.")
+    if not has_multiple_periods(view):
+        st.info("Needs more than one count date. Widen the date filter to see trajectories.")
+    else:
+        traj = shrinkage_trajectory(view)
+        if traj.empty:
+            st.success("No shrinkage trajectories to report in the current view.")
+        else:
+            worsening = traj[traj["trend"] == "worsening"]
+            improving = traj[traj["trend"] == "improving"]
+            k1, k2, k3 = st.columns(3)
+            k1.markdown(metric_card("Worsening", f"{len(worsening)}",
+                                    "getting worse", accent=LOSS), unsafe_allow_html=True)
+            k2.markdown(metric_card("Improving", f"{len(improving)}",
+                                    "getting better", accent=GAIN), unsafe_allow_html=True)
+            k3.markdown(metric_card("Stable", f"{int((traj['trend']=='stable').sum())}",
+                                    "little change", accent=BRASS), unsafe_allow_html=True)
+            st.write("")
+            if not worsening.empty:
+                show = worsening.head(12).copy()
+                show["path"] = show["series"].apply(
+                    lambda v: " → ".join(f"${abs(x):,.0f}" for x in v))
+                disp = show[["product_name", "path", "change"]].rename(columns={
+                    "product_name": "Product", "path": "Loss by period",
+                    "change": "Worsened by"})
+                st.dataframe(disp.style.format({"Worsened by": "${:,.0f}"}),
+                             use_container_width=True, hide_index=True)
+
+    st.divider()
+    st.subheader("Low-stock risk")
+    st.caption("Items whose most recent count sits well below their usual level — "
+               "candidates to reorder before they run out.")
+    risk, latest_date = stockout_risk(view)
+    st.markdown(f"<span style='color:{MUTE};font-size:0.82rem;'>"
+                f"Based on the latest count: {latest_date}</span>", unsafe_allow_html=True)
+    st.write("")
+    if risk.empty:
+        st.success("No items are critically low in the latest count.")
+    else:
+        disp = risk.rename(columns={
+            "product_name": "Product", "category": "Category", "location": "Shop",
+            "counted_qty": "In stock", "typical_qty": "Usual level",
+            "pct_of_typical": "% of usual", "unit_cost": "Unit cost"})
+        st.dataframe(disp.style.format({"% of usual": "{:.0f}%", "Unit cost": "${:,.2f}",
+                                        "Usual level": "{:.0f}"}),
+                     use_container_width=True, hide_index=True)
+    st.caption("Note: a stock-take shows levels, not sales speed. This flags items "
+               "low relative to their normal stock, not a full demand forecast.")
+
 # ---- Anomalies ------------------------------------------------------------ #
 with tab_anoms:
     st.subheader("Statistical anomalies (IQR method)")
@@ -439,15 +530,20 @@ with tab_anoms:
 # ---- AI Briefing ---------------------------------------------------------- #
 with tab_ai:
     st.subheader("AI-written executive briefing")
-    st.caption("Claude analyses the computed statistics (not raw rows) and drafts a "
-               "manager-ready briefing with findings and recommendations.")
+    st.caption("An AI model reads the computed statistics (not raw rows) and drafts "
+               "a manager-ready briefing with findings and recommendations. "
+               "Powered by Google Gemini, which has a free tier.")
 
     api_key = ai_analyst.get_api_key()
     if not api_key:
-        st.warning(
-            "No Anthropic API key found. Add `ANTHROPIC_API_KEY` in your Streamlit "
-            "app settings under **Secrets** (or as an environment variable locally) "
-            "to enable AI features."
+        st.info(
+            "**AI briefing not configured.** This optional feature uses Google "
+            "Gemini's free tier. To enable it:\n\n"
+            "1. Get a free key at https://aistudio.google.com/app/apikey\n"
+            "2. In your Streamlit app, open **Settings → Secrets**\n"
+            "3. Add this line, keeping the quotes:\n"
+            "   `GEMINI_API_KEY = \"your-key-here\"`\n\n"
+            "Every other tab works fully without this."
         )
     else:
         stats = ai_analyst.build_stats_payload(
@@ -460,7 +556,7 @@ with tab_ai:
         )
 
         if st.button("Generate briefing", type="primary"):
-            with st.spinner("Claude is analysing the stock-take..."):
+            with st.spinner("Generating the briefing..."):
                 try:
                     report = ai_analyst.generate_report(stats, api_key)
                     st.session_state["ai_report"] = report
@@ -499,5 +595,6 @@ with tab_data:
                        file_name="stockpulse_variance.csv", mime="text/csv")
 
 st.divider()
-st.caption("StockPulse Analytics v2 · variance = counted − expected · "
-           "shrinkage = value of shortages · anomalies via 1.5×IQR.")
+st.caption("StockPulse Analytics · variance = counted − expected · "
+           "shrinkage = value of shortages · benchmarks graded 3% / 5% · "
+           "anomalies via 1.5×IQR.")

@@ -194,3 +194,138 @@ def recurring_offenders(df: pd.DataFrame, min_periods: int = 2) -> pd.DataFrame:
     )
     agg = agg[agg["periods_short"] >= min_periods]
     return agg.sort_values("total_shrinkage_value").reset_index(drop=True)
+
+
+# --------------------------------------------------------------------------- #
+# Benchmarking & alerts
+# --------------------------------------------------------------------------- #
+def _band(pct: float, amber: float, red: float) -> str:
+    """Return a traffic-light band for a shrinkage percentage."""
+    if pct >= red:
+        return "red"
+    if pct >= amber:
+        return "amber"
+    return "green"
+
+
+def benchmark_by_dimension(
+    df: pd.DataFrame, dimension: str, amber: float = 3.0, red: float = 5.0
+) -> pd.DataFrame:
+    """
+    Shrinkage as a percentage of stock value for each value of `dimension`,
+    with a traffic-light status band.
+
+    Fresh-meat retail typically runs 2-5% shrink, so the default thresholds
+    flag anything above 3% (amber) and 5% (red).
+    """
+    rows = []
+    for key, grp in df.groupby(dimension):
+        stock_value = float((grp["expected_qty"] * grp["unit_cost"]).sum())
+        short = grp[grp["qty_variance"] < 0]
+        shrink_value = float(short["value_variance"].sum())  # negative
+        pct = abs(shrink_value) / stock_value * 100 if stock_value else 0.0
+        rows.append({
+            dimension: key,
+            "shrinkage_value": shrink_value,
+            "stock_value": stock_value,
+            "shrinkage_pct": pct,
+            "status": _band(pct, amber, red),
+        })
+    out = pd.DataFrame(rows).sort_values("shrinkage_pct", ascending=False)
+    return out.reset_index(drop=True)
+
+
+# --------------------------------------------------------------------------- #
+# Worsening-trend detection
+# --------------------------------------------------------------------------- #
+def shrinkage_trajectory(df: pd.DataFrame, min_periods: int = 2) -> pd.DataFrame:
+    """
+    For each product, track shrinkage value across count dates and classify the
+    direction as worsening, improving, or stable.
+
+    A product losing progressively more each period is 'worsening' — a live,
+    accelerating problem that matters more than a steadily bad one. Direction is
+    judged by comparing the latest period's shrinkage to the earliest.
+    """
+    periods = sorted(df["count_date"].dropna().unique())
+    if len(periods) < min_periods:
+        return pd.DataFrame(
+            columns=["product_name", "trend", "first_value", "latest_value",
+                     "change", "series"]
+        )
+
+    # Shrinkage (losses only) per product per date.
+    short = df[df["qty_variance"] < 0]
+    pivot = (
+        short.groupby(["product_name", "count_date"])["value_variance"]
+        .sum()
+        .unstack(fill_value=0.0)
+        .reindex(columns=periods, fill_value=0.0)
+    )
+
+    rows = []
+    for product, series in pivot.iterrows():
+        vals = [float(series[p]) for p in periods]  # each <= 0
+        first, latest = vals[0], vals[-1]
+        change = latest - first  # more negative => worsening
+        if abs(change) < 0.01 * max(1.0, abs(first)) or abs(change) < 5:
+            trend = "stable"
+        elif change < 0:
+            trend = "worsening"
+        else:
+            trend = "improving"
+        # Only report products that have some shrinkage somewhere.
+        if any(v < 0 for v in vals):
+            rows.append({
+                "product_name": product,
+                "trend": trend,
+                "first_value": first,
+                "latest_value": latest,
+                "change": change,
+                "series": vals,
+            })
+
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+    # Worsening first, ordered by how much worse.
+    order = {"worsening": 0, "stable": 1, "improving": 2}
+    out["_o"] = out["trend"].map(order)
+    out = out.sort_values(["_o", "change"]).drop(columns="_o")
+    return out.reset_index(drop=True)
+
+
+# --------------------------------------------------------------------------- #
+# Stock-out / low-stock risk
+# --------------------------------------------------------------------------- #
+def stockout_risk(df: pd.DataFrame, critical_pct: float = 20.0) -> pd.DataFrame:
+    """
+    Flag items whose most recent counted quantity is critically low relative to
+    the level they are normally stocked at.
+
+    NOTE: a true reorder model needs sales/depletion data, which a stock-take
+    alone does not contain. This is a *low-stock* signal: for each product+shop
+    it compares the latest counted quantity to that item's typical (median)
+    expected level, and flags anything sitting below `critical_pct` of normal.
+    """
+    latest_date = sorted(df["count_date"].dropna().unique())[-1]
+    latest = df[df["count_date"] == latest_date].copy()
+
+    # Typical stock level per product+shop across all periods.
+    typical = (
+        df.groupby(["product_name", "location"])["expected_qty"]
+        .median()
+        .rename("typical_qty")
+        .reset_index()
+    )
+    merged = latest.merge(typical, on=["product_name", "location"], how="left")
+    merged["pct_of_typical"] = (
+        merged["counted_qty"] / merged["typical_qty"].replace(0, pd.NA) * 100
+    ).fillna(0.0)
+
+    at_risk = merged[merged["pct_of_typical"] <= critical_pct].copy()
+    at_risk = at_risk[[
+        "product_name", "category", "location", "counted_qty",
+        "typical_qty", "pct_of_typical", "unit_cost",
+    ]].sort_values("pct_of_typical")
+    return at_risk.reset_index(drop=True), latest_date

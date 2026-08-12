@@ -1,12 +1,14 @@
 """
-AI analyst layer for StockPulse.
+AI analyst layer for StockPulse (Google Gemini, free-tier friendly).
 
 Turns the *computed statistics* (never the raw rows) into a written executive
-briefing with findings and recommendations. Feeding summarised numbers rather
-than raw data keeps the model grounded and avoids hallucinated line items.
+briefing with findings and recommendations, and answers free-text questions.
+Feeding summarised numbers rather than raw data keeps the model grounded and
+avoids hallucinated line items.
 
-Requires an Anthropic API key, supplied via Streamlit secrets or the
-ANTHROPIC_API_KEY environment variable.
+Uses Google's Gemini API, which offers a free tier. Supply an API key via
+Streamlit secrets (GEMINI_API_KEY) or the GEMINI_API_KEY environment variable.
+Get a free key at https://aistudio.google.com/app/apikey
 """
 
 from __future__ import annotations
@@ -15,20 +17,28 @@ import json
 import os
 
 import pandas as pd
+import requests
 
-MODEL = "claude-sonnet-4-6"
+# Gemini model + endpoint. If Google changes model names, update MODEL only.
+MODEL = "gemini-1.5-flash"
+ENDPOINT = (
+    "https://generativelanguage.googleapis.com/v1beta/models/"
+    "{model}:generateContent"
+)
+TIMEOUT = 45
 
 
 def get_api_key() -> str | None:
-    """Look for the key in Streamlit secrets first, then the environment."""
+    """Look for the Gemini key in Streamlit secrets first, then the environment."""
     try:
         import streamlit as st
 
-        if "ANTHROPIC_API_KEY" in st.secrets:
-            return st.secrets["ANTHROPIC_API_KEY"]
+        for name in ("GEMINI_API_KEY", "GOOGLE_API_KEY"):
+            if name in st.secrets:
+                return st.secrets[name]
     except Exception:
         pass
-    return os.environ.get("ANTHROPIC_API_KEY")
+    return os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
 
 
 def build_stats_payload(
@@ -67,18 +77,18 @@ def build_stats_payload(
 
 SYSTEM_PROMPT = (
     "You are a senior inventory and loss-prevention analyst writing a briefing "
-    "for a retail operations manager. You are given pre-computed statistics from "
-    "a physical stock-take (never raw records). Base every claim strictly on the "
-    "numbers provided; do not invent SKUs, figures, or trends that are not in the "
-    "data. Write in clear, confident business prose. Use concrete dollar figures "
-    "from the data. Distinguish shortages (possible loss/theft) from overages "
-    "(likely receiving or counting errors). Where a product shows shortages across "
-    "multiple periods, treat that as a stronger shrinkage signal than a one-off. "
-    "Be specific and actionable; avoid generic filler."
+    "for a retail butcher's operations manager. You are given pre-computed "
+    "statistics from a physical stock-take (never raw records). Base every claim "
+    "strictly on the numbers provided; do not invent products, figures, or trends "
+    "that are not in the data. Write in clear, confident business prose. Use "
+    "concrete currency figures from the data. Distinguish shortages (possible "
+    "loss/theft/spoilage) from overages (likely receiving or counting errors). "
+    "Where a product shows shortages across multiple periods, treat that as a "
+    "stronger shrinkage signal than a one-off. Be specific and actionable; avoid "
+    "generic filler."
 )
 
-USER_TEMPLATE = (
-    "Here are the computed stock-take statistics as JSON:\n\n{stats}\n\n"
+REPORT_INSTRUCTIONS = (
     "Write a briefing in Markdown with exactly these sections:\n\n"
     "## Executive summary\n"
     "3-4 sentences on overall inventory health, accuracy, and the headline "
@@ -95,53 +105,63 @@ USER_TEMPLATE = (
 )
 
 
-def generate_report(stats: dict, api_key: str) -> str:
-    """Call Claude and return the Markdown briefing. Raises on API error."""
-    from anthropic import Anthropic
+def _call_gemini(api_key: str, system: str, user: str, max_tokens: int) -> str:
+    """Low-level Gemini REST call. Raises RuntimeError with a clear message."""
+    url = ENDPOINT.format(model=MODEL)
+    payload = {
+        "system_instruction": {"parts": [{"text": system}]},
+        "contents": [{"role": "user", "parts": [{"text": user}]}],
+        "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.4},
+    }
+    try:
+        resp = requests.post(
+            url, params={"key": api_key}, json=payload, timeout=TIMEOUT
+        )
+    except requests.RequestException as e:
+        raise RuntimeError(f"Network error contacting Gemini: {e}") from e
 
-    client = Anthropic(api_key=api_key)
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=1500,
-        system=SYSTEM_PROMPT,
-        messages=[
-            {
-                "role": "user",
-                "content": USER_TEMPLATE.format(
-                    stats=json.dumps(stats, indent=2, default=str)
-                ),
-            }
-        ],
+    if resp.status_code != 200:
+        # Surface Google's error message so the user can act on it.
+        detail = ""
+        try:
+            detail = resp.json().get("error", {}).get("message", "")
+        except Exception:
+            detail = resp.text[:300]
+        raise RuntimeError(
+            f"Gemini API returned {resp.status_code}: {detail or 'unknown error'}"
+        )
+
+    data = resp.json()
+    try:
+        parts = data["candidates"][0]["content"]["parts"]
+        return "".join(p.get("text", "") for p in parts).strip()
+    except (KeyError, IndexError):
+        # e.g. blocked content or an empty candidate.
+        raise RuntimeError(
+            "Gemini returned no usable text. It may have blocked the request or "
+            "hit a token limit. Try again or shorten the question."
+        )
+
+
+def generate_report(stats: dict, api_key: str) -> str:
+    """Return the Markdown briefing. Raises RuntimeError on API error."""
+    user = (
+        "Here are the computed stock-take statistics as JSON:\n\n"
+        f"{json.dumps(stats, indent=2, default=str)}\n\n"
+        f"{REPORT_INSTRUCTIONS}"
     )
-    return "".join(
-        block.text for block in message.content if block.type == "text"
-    )
+    return _call_gemini(api_key, SYSTEM_PROMPT, user, max_tokens=1500)
 
 
 def answer_question(stats: dict, question: str, api_key: str) -> str:
     """Answer a free-text question grounded only in the computed stats."""
-    from anthropic import Anthropic
-
-    client = Anthropic(api_key=api_key)
-    message = client.messages.create(
-        model=MODEL,
-        max_tokens=800,
-        system=(
-            SYSTEM_PROMPT
-            + " Answer the user's question using only the provided statistics. "
-            "If the answer is not derivable from the data, say so plainly rather "
-            "than guessing."
-        ),
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Statistics:\n{json.dumps(stats, indent=2, default=str)}\n\n"
-                    f"Question: {question}"
-                ),
-            }
-        ],
+    system = (
+        SYSTEM_PROMPT
+        + " Answer the user's question using only the provided statistics. If the "
+        "answer is not derivable from the data, say so plainly rather than guessing."
     )
-    return "".join(
-        block.text for block in message.content if block.type == "text"
+    user = (
+        f"Statistics:\n{json.dumps(stats, indent=2, default=str)}\n\n"
+        f"Question: {question}"
     )
+    return _call_gemini(api_key, system, user, max_tokens=800)

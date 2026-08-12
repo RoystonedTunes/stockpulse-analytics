@@ -119,3 +119,44 @@ def test_recurring_offenders_flags_persistent_shortage():
     assert "leaky" in set(ro["product_name"])
     assert "fine" not in set(ro["product_name"])
     assert int(ro.loc[ro["product_name"] == "leaky", "periods_short"].iloc[0]) == 3
+
+
+# ---- ops features: benchmark, trajectory, stockout ---------------------- #
+
+def test_benchmark_bands():
+    from analytics import compute_variance, benchmark_by_dimension
+    b = benchmark_by_dimension(compute_variance(_frame()), "category")
+    assert set(["category", "shrinkage_pct", "status"]).issubset(b.columns)
+    assert set(b["status"]).issubset({"green", "amber", "red"})
+
+
+def test_shrinkage_trajectory_detects_worsening():
+    import pandas as pd
+    from analytics import compute_variance, shrinkage_trajectory
+    rows = []
+    # 'decliner' loses progressively more; 'steady' is flat at zero variance.
+    shorts = {"2026-06-01": 95, "2026-07-01": 90, "2026-08-01": 60}
+    for date, counted in shorts.items():
+        rows.append({"sku": "A", "product_name": "decliner", "category": "X",
+                     "location": "W1", "expected_qty": 100, "counted_qty": counted,
+                     "unit_cost": 10.0, "count_date": date})
+    df = compute_variance(pd.DataFrame(rows))
+    traj = shrinkage_trajectory(df)
+    row = traj[traj["product_name"] == "decliner"].iloc[0]
+    # loss went 50 -> 100 -> 400 in value terms; latest worse than first.
+    assert row["trend"] == "worsening"
+
+
+def test_stockout_risk_flags_low_item():
+    import pandas as pd
+    from analytics import compute_variance, stockout_risk
+    rows = [
+        {"sku": "A", "product_name": "p", "category": "X", "location": "W1",
+         "expected_qty": 100, "counted_qty": 100, "unit_cost": 5.0, "count_date": "2026-06-01"},
+        {"sku": "A", "product_name": "p", "category": "X", "location": "W1",
+         "expected_qty": 100, "counted_qty": 5, "unit_cost": 5.0, "count_date": "2026-07-01"},
+    ]
+    df = compute_variance(pd.DataFrame(rows))
+    risk, latest = stockout_risk(df)
+    assert latest == "2026-07-01"
+    assert "p" in set(risk["product_name"])

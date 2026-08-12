@@ -1,151 +1,406 @@
 sku,product_name,category,location,expected_qty,counted_qty,unit_cost,count_date
-SKU-1001,Wireless Mouse,Electronics,Warehouse C,127,125,279.1,2026-06-01
-SKU-1002,Wireless Mouse,Electronics,Warehouse C,123,123,279.1,2026-07-01
-SKU-1003,Wireless Mouse,Electronics,Warehouse C,127,125,279.1,2026-08-01
-SKU-1004,USB-C Cable 1m,Electronics,Warehouse C,135,188,51.29,2026-06-01
-SKU-1005,USB-C Cable 1m,Electronics,Warehouse C,119,143,51.29,2026-07-01
-SKU-1006,USB-C Cable 1m,Electronics,Warehouse C,125,130,51.29,2026-08-01
-SKU-1007,Bluetooth Speaker,Electronics,Warehouse C,368,463,102.99,2026-06-01
-SKU-1008,Bluetooth Speaker,Electronics,Warehouse C,388,469,102.99,2026-07-01
-SKU-1009,Bluetooth Speaker,Electronics,Warehouse C,381,383,102.99,2026-08-01
-SKU-1010,HDMI Cable 2m,Electronics,Warehouse C,165,160,301.19,2026-06-01
-SKU-1011,HDMI Cable 2m,Electronics,Warehouse C,148,143,301.19,2026-07-01
-SKU-1012,HDMI Cable 2m,Electronics,Warehouse C,170,168,301.19,2026-08-01
-SKU-1013,Monitor 24in,Electronics,Warehouse C,427,428,239.96,2026-06-01
-SKU-1014,Monitor 24in,Electronics,Warehouse C,414,408,239.96,2026-07-01
-SKU-1015,Monitor 24in,Electronics,Warehouse C,403,400,239.96,2026-08-01
-SKU-1016,Webcam HD,Electronics,Warehouse B,25,20,149.67,2026-06-01
-SKU-1017,Webcam HD,Electronics,Warehouse B,41,44,149.67,2026-07-01
-SKU-1018,Webcam HD,Electronics,Warehouse B,45,46,149.67,2026-08-01
-SKU-1019,Laptop Charger,Electronics,Warehouse A,505,500,69.8,2026-06-01
-SKU-1020,Laptop Charger,Electronics,Warehouse A,490,493,69.8,2026-07-01
-SKU-1021,Laptop Charger,Electronics,Warehouse A,500,505,69.8,2026-08-01
-SKU-1022,Power Bank 10000mAh,Electronics,Warehouse A,55,34,104.75,2026-06-01
-SKU-1023,Power Bank 10000mAh,Electronics,Warehouse A,66,70,104.75,2026-07-01
-SKU-1024,Power Bank 10000mAh,Electronics,Warehouse A,73,69,104.75,2026-08-01
-SKU-1025,Wireless Earbuds,Electronics,Warehouse A,442,444,270.29,2026-06-01
-SKU-1026,Wireless Earbuds,Electronics,Warehouse A,460,461,270.29,2026-07-01
-SKU-1027,Wireless Earbuds,Electronics,Warehouse A,444,444,270.29,2026-08-01
-SKU-1028,External SSD 1TB,Electronics,Warehouse A,423,422,234.59,2026-06-01
-SKU-1029,External SSD 1TB,Electronics,Warehouse A,447,443,234.59,2026-07-01
-SKU-1030,External SSD 1TB,Electronics,Warehouse A,425,421,234.59,2026-08-01
-SKU-1031,Laptop Stand,Office,Warehouse C,284,286,253.02,2026-06-01
-SKU-1032,Laptop Stand,Office,Warehouse C,285,288,253.02,2026-07-01
-SKU-1033,Laptop Stand,Office,Warehouse C,298,173,253.02,2026-08-01
-SKU-1034,Ergonomic Keyboard,Office,Warehouse D,258,258,111.05,2026-06-01
-SKU-1035,Ergonomic Keyboard,Office,Warehouse D,261,265,111.05,2026-07-01
-SKU-1036,Ergonomic Keyboard,Office,Warehouse D,283,283,111.05,2026-08-01
-SKU-1037,Desk Lamp LED,Office,Warehouse D,202,204,243.63,2026-06-01
-SKU-1038,Desk Lamp LED,Office,Warehouse D,221,226,243.63,2026-07-01
-SKU-1039,Desk Lamp LED,Office,Warehouse D,212,216,243.63,2026-08-01
-SKU-1040,Printer Toner Black,Office,Warehouse D,166,160,282.89,2026-06-01
-SKU-1041,Printer Toner Black,Office,Warehouse D,142,144,282.89,2026-07-01
-SKU-1042,Printer Toner Black,Office,Warehouse D,161,157,282.89,2026-08-01
-SKU-1043,Printer Paper Ream,Office,Warehouse C,381,375,58.88,2026-06-01
-SKU-1044,Printer Paper Ream,Office,Warehouse C,391,392,58.88,2026-07-01
-SKU-1045,Printer Paper Ream,Office,Warehouse C,387,388,58.88,2026-08-01
-SKU-1046,Label Printer,Office,Warehouse B,263,268,142.24,2026-06-01
-SKU-1047,Label Printer,Office,Warehouse B,276,272,142.24,2026-07-01
-SKU-1048,Label Printer,Office,Warehouse B,263,264,142.24,2026-08-01
-SKU-1049,Shredder,Office,Warehouse B,96,96,94.47,2026-06-01
-SKU-1050,Shredder,Office,Warehouse B,99,93,94.47,2026-07-01
-SKU-1051,Shredder,Office,Warehouse B,113,111,94.47,2026-08-01
-SKU-1052,Desk Organizer,Office,Warehouse B,208,212,157.55,2026-06-01
-SKU-1053,Desk Organizer,Office,Warehouse B,209,208,157.55,2026-07-01
-SKU-1054,Desk Organizer,Office,Warehouse B,209,204,157.55,2026-08-01
-SKU-1055,Monitor Arm,Office,Warehouse C,227,229,140.49,2026-06-01
-SKU-1056,Monitor Arm,Office,Warehouse C,239,235,140.49,2026-07-01
-SKU-1057,Monitor Arm,Office,Warehouse C,231,228,140.49,2026-08-01
-SKU-1058,Whiteboard,Office,Warehouse C,435,435,249.34,2026-06-01
-SKU-1059,Whiteboard,Office,Warehouse C,436,437,249.34,2026-07-01
-SKU-1060,Whiteboard,Office,Warehouse C,423,417,249.34,2026-08-01
-SKU-1061,Notebook A5,Stationery,Warehouse A,298,301,120.36,2026-06-01
-SKU-1062,Notebook A5,Stationery,Warehouse A,283,286,120.36,2026-07-01
-SKU-1063,Notebook A5,Stationery,Warehouse A,296,301,120.36,2026-08-01
-SKU-1064,Ballpoint Pen Pack,Stationery,Warehouse D,412,410,85.79,2026-06-01
-SKU-1065,Ballpoint Pen Pack,Stationery,Warehouse D,409,411,85.79,2026-07-01
-SKU-1066,Ballpoint Pen Pack,Stationery,Warehouse D,385,381,85.79,2026-08-01
-SKU-1067,Whiteboard Marker,Stationery,Warehouse D,418,422,310.65,2026-06-01
-SKU-1068,Whiteboard Marker,Stationery,Warehouse D,434,433,310.65,2026-07-01
-SKU-1069,Whiteboard Marker,Stationery,Warehouse D,425,421,310.65,2026-08-01
-SKU-1070,Sticky Notes,Stationery,Warehouse C,150,186,36.86,2026-06-01
-SKU-1071,Sticky Notes,Stationery,Warehouse C,127,129,36.86,2026-07-01
-SKU-1072,Sticky Notes,Stationery,Warehouse C,129,123,36.86,2026-08-01
-SKU-1073,Highlighter Set,Stationery,Warehouse D,435,435,114.9,2026-06-01
-SKU-1074,Highlighter Set,Stationery,Warehouse D,414,408,114.9,2026-07-01
-SKU-1075,Highlighter Set,Stationery,Warehouse D,427,281,114.9,2026-08-01
-SKU-1076,Stapler,Stationery,Warehouse B,41,40,86.53,2026-06-01
-SKU-1077,Stapler,Stationery,Warehouse B,43,38,86.53,2026-07-01
-SKU-1078,Stapler,Stationery,Warehouse B,56,61,86.53,2026-08-01
-SKU-1079,Paper Clips Box,Stationery,Warehouse A,408,404,173.14,2026-06-01
-SKU-1080,Paper Clips Box,Stationery,Warehouse A,384,321,173.14,2026-07-01
-SKU-1081,Paper Clips Box,Stationery,Warehouse A,392,390,173.14,2026-08-01
-SKU-1082,Envelope Pack,Stationery,Warehouse A,24,18,130.5,2026-06-01
-SKU-1083,Envelope Pack,Stationery,Warehouse A,33,29,130.5,2026-07-01
-SKU-1084,Envelope Pack,Stationery,Warehouse A,47,45,130.5,2026-08-01
-SKU-1085,Correction Tape,Stationery,Warehouse D,432,434,298.12,2026-06-01
-SKU-1086,Correction Tape,Stationery,Warehouse D,439,442,298.12,2026-07-01
-SKU-1087,Correction Tape,Stationery,Warehouse D,432,433,298.12,2026-08-01
-SKU-1088,Ring Binder,Stationery,Warehouse B,150,154,215.83,2026-06-01
-SKU-1089,Ring Binder,Stationery,Warehouse B,137,131,215.83,2026-07-01
-SKU-1090,Ring Binder,Stationery,Warehouse B,135,139,215.83,2026-08-01
-SKU-1091,Office Chair,Furniture,Warehouse A,269,265,126.78,2026-06-01
-SKU-1092,Office Chair,Furniture,Warehouse A,277,282,126.78,2026-07-01
-SKU-1093,Office Chair,Furniture,Warehouse A,285,396,126.78,2026-08-01
-SKU-1094,Filing Cabinet,Furniture,Warehouse B,350,262,26.22,2026-06-01
-SKU-1095,Filing Cabinet,Furniture,Warehouse B,362,362,26.22,2026-07-01
-SKU-1096,Filing Cabinet,Furniture,Warehouse B,356,359,26.22,2026-08-01
-SKU-1097,Standing Desk,Furniture,Warehouse B,102,96,343.67,2026-06-01
-SKU-1098,Standing Desk,Furniture,Warehouse B,96,71,343.67,2026-07-01
-SKU-1099,Standing Desk,Furniture,Warehouse B,104,105,343.67,2026-08-01
-SKU-1100,Bookshelf,Furniture,Warehouse D,71,70,96.13,2026-06-01
-SKU-1101,Bookshelf,Furniture,Warehouse D,79,75,96.13,2026-07-01
-SKU-1102,Bookshelf,Furniture,Warehouse D,89,84,96.13,2026-08-01
-SKU-1103,Meeting Table,Furniture,Warehouse C,154,150,250.54,2026-06-01
-SKU-1104,Meeting Table,Furniture,Warehouse C,165,168,250.54,2026-07-01
-SKU-1105,Meeting Table,Furniture,Warehouse C,142,142,250.54,2026-08-01
-SKU-1106,Reception Sofa,Furniture,Warehouse A,141,135,244.05,2026-06-01
-SKU-1107,Reception Sofa,Furniture,Warehouse A,155,154,244.05,2026-07-01
-SKU-1108,Reception Sofa,Furniture,Warehouse A,156,154,244.05,2026-08-01
-SKU-1109,Storage Locker,Furniture,Warehouse C,403,403,334.27,2026-06-01
-SKU-1110,Storage Locker,Furniture,Warehouse C,401,397,334.27,2026-07-01
-SKU-1111,Storage Locker,Furniture,Warehouse C,403,408,334.27,2026-08-01
-SKU-1112,Bar Stool,Furniture,Warehouse B,96,94,34.31,2026-06-01
-SKU-1113,Bar Stool,Furniture,Warehouse B,94,121,34.31,2026-07-01
-SKU-1114,Bar Stool,Furniture,Warehouse B,89,87,34.31,2026-08-01
-SKU-1115,Coat Rack,Furniture,Warehouse B,41,38,18.25,2026-06-01
-SKU-1116,Coat Rack,Furniture,Warehouse B,46,49,18.25,2026-07-01
-SKU-1117,Coat Rack,Furniture,Warehouse B,37,34,18.25,2026-08-01
-SKU-1118,Side Table,Furniture,Warehouse C,31,41,26.09,2026-06-01
-SKU-1119,Side Table,Furniture,Warehouse C,49,44,26.09,2026-07-01
-SKU-1120,Side Table,Furniture,Warehouse C,32,26,26.09,2026-08-01
-SKU-1121,Coffee Mug Branded,Kitchen,Warehouse A,470,464,191.65,2026-06-01
-SKU-1122,Coffee Mug Branded,Kitchen,Warehouse A,466,471,191.65,2026-07-01
-SKU-1123,Coffee Mug Branded,Kitchen,Warehouse A,487,358,191.65,2026-08-01
-SKU-1124,Water Bottle,Kitchen,Warehouse C,289,365,34.41,2026-06-01
-SKU-1125,Water Bottle,Kitchen,Warehouse C,276,338,34.41,2026-07-01
-SKU-1126,Water Bottle,Kitchen,Warehouse C,273,203,34.41,2026-08-01
-SKU-1127,Paper Towel Roll,Kitchen,Warehouse D,113,115,307.3,2026-06-01
-SKU-1128,Paper Towel Roll,Kitchen,Warehouse D,92,94,307.3,2026-07-01
-SKU-1129,Paper Towel Roll,Kitchen,Warehouse D,112,106,307.3,2026-08-01
-SKU-1130,Coffee Pods Box,Kitchen,Warehouse B,129,130,145.3,2026-06-01
-SKU-1131,Coffee Pods Box,Kitchen,Warehouse B,135,133,145.3,2026-07-01
-SKU-1132,Coffee Pods Box,Kitchen,Warehouse B,124,124,145.3,2026-08-01
-SKU-1133,Snack Pack,Kitchen,Warehouse B,247,244,84.53,2026-06-01
-SKU-1134,Snack Pack,Kitchen,Warehouse B,246,250,84.53,2026-07-01
-SKU-1135,Snack Pack,Kitchen,Warehouse B,249,254,84.53,2026-08-01
-SKU-1136,Dish Soap,Kitchen,Warehouse D,467,464,317.03,2026-06-01
-SKU-1137,Dish Soap,Kitchen,Warehouse D,477,475,317.03,2026-07-01
-SKU-1138,Dish Soap,Kitchen,Warehouse D,463,465,317.03,2026-08-01
-SKU-1139,Kettle,Kitchen,Warehouse D,470,472,235.87,2026-06-01
-SKU-1140,Kettle,Kitchen,Warehouse D,456,657,235.87,2026-07-01
-SKU-1141,Kettle,Kitchen,Warehouse D,463,461,235.87,2026-08-01
-SKU-1142,Microwave,Kitchen,Warehouse C,187,253,310.86,2026-06-01
-SKU-1143,Microwave,Kitchen,Warehouse C,202,201,310.86,2026-07-01
-SKU-1144,Microwave,Kitchen,Warehouse C,183,184,310.86,2026-08-01
-SKU-1145,Fridge Organizer,Kitchen,Warehouse C,209,207,139.73,2026-06-01
-SKU-1146,Fridge Organizer,Kitchen,Warehouse C,189,183,139.73,2026-07-01
-SKU-1147,Fridge Organizer,Kitchen,Warehouse C,205,205,139.73,2026-08-01
-SKU-1148,Cutlery Set,Kitchen,Warehouse D,236,232,207.77,2026-06-01
-SKU-1149,Cutlery Set,Kitchen,Warehouse D,259,259,207.77,2026-07-01
-SKU-1150,Cutlery Set,Kitchen,Warehouse D,257,253,207.77,2026-08-01
+SKU-5001,Ribeye Steak (kg),Beef,Clonmel,22,21,34.0,2026-05-01
+SKU-5002,Ribeye Steak (kg),Beef,Clonmel,21,19,34.0,2026-06-01
+SKU-5003,Ribeye Steak (kg),Beef,Clonmel,33,33,34.0,2026-07-01
+SKU-5004,Ribeye Steak (kg),Beef,Naas,29,29,34.0,2026-05-01
+SKU-5005,Ribeye Steak (kg),Beef,Naas,21,21,34.0,2026-06-01
+SKU-5006,Ribeye Steak (kg),Beef,Naas,11,9,34.0,2026-07-01
+SKU-5007,Ribeye Steak (kg),Beef,Limerick,32,33,34.0,2026-05-01
+SKU-5008,Ribeye Steak (kg),Beef,Limerick,49,40,34.0,2026-06-01
+SKU-5009,Ribeye Steak (kg),Beef,Limerick,31,31,34.0,2026-07-01
+SKU-5010,Ribeye Steak (kg),Beef,Cornelscourt,38,37,34.0,2026-05-01
+SKU-5011,Ribeye Steak (kg),Beef,Cornelscourt,26,27,34.0,2026-06-01
+SKU-5012,Ribeye Steak (kg),Beef,Cornelscourt,38,38,34.0,2026-07-01
+SKU-5013,Striploin Steak (kg),Beef,Cornelscourt,19,18,30.0,2026-05-01
+SKU-5014,Striploin Steak (kg),Beef,Cornelscourt,52,47,30.0,2026-06-01
+SKU-5015,Striploin Steak (kg),Beef,Cornelscourt,27,27,30.0,2026-07-01
+SKU-5016,Striploin Steak (kg),Beef,Tralee,15,14,30.0,2026-05-01
+SKU-5017,Striploin Steak (kg),Beef,Tralee,33,33,30.0,2026-06-01
+SKU-5018,Striploin Steak (kg),Beef,Tralee,25,25,30.0,2026-07-01
+SKU-5019,Striploin Steak (kg),Beef,Rathmines,20,20,30.0,2026-05-01
+SKU-5020,Striploin Steak (kg),Beef,Rathmines,53,48,30.0,2026-06-01
+SKU-5021,Striploin Steak (kg),Beef,Rathmines,47,46,30.0,2026-07-01
+SKU-5022,Striploin Steak (kg),Beef,Limerick,47,47,30.0,2026-05-01
+SKU-5023,Striploin Steak (kg),Beef,Limerick,39,40,30.0,2026-06-01
+SKU-5024,Striploin Steak (kg),Beef,Limerick,9,10,30.0,2026-07-01
+SKU-5025,Striploin Steak (kg),Beef,Naas,30,30,30.0,2026-05-01
+SKU-5026,Striploin Steak (kg),Beef,Naas,32,32,30.0,2026-06-01
+SKU-5027,Striploin Steak (kg),Beef,Naas,16,16,30.0,2026-07-01
+SKU-5028,Striploin Steak (kg),Beef,Clonmel,47,43,30.0,2026-05-01
+SKU-5029,Striploin Steak (kg),Beef,Clonmel,27,26,30.0,2026-06-01
+SKU-5030,Striploin Steak (kg),Beef,Clonmel,22,21,30.0,2026-07-01
+SKU-5031,Fillet Steak (kg),Beef,Limerick,41,40,48.0,2026-05-01
+SKU-5032,Fillet Steak (kg),Beef,Limerick,52,52,48.0,2026-06-01
+SKU-5033,Fillet Steak (kg),Beef,Limerick,10,8,48.0,2026-07-01
+SKU-5034,Fillet Steak (kg),Beef,Rathmines,17,16,48.0,2026-05-01
+SKU-5035,Fillet Steak (kg),Beef,Rathmines,21,20,48.0,2026-06-01
+SKU-5036,Fillet Steak (kg),Beef,Rathmines,42,41,48.0,2026-07-01
+SKU-5037,Fillet Steak (kg),Beef,Cornelscourt,55,49,48.0,2026-05-01
+SKU-5038,Fillet Steak (kg),Beef,Cornelscourt,25,25,48.0,2026-06-01
+SKU-5039,Fillet Steak (kg),Beef,Cornelscourt,35,31,48.0,2026-07-01
+SKU-5040,Fillet Steak (kg),Beef,Tralee,36,36,48.0,2026-05-01
+SKU-5041,Fillet Steak (kg),Beef,Tralee,23,22,48.0,2026-06-01
+SKU-5042,Fillet Steak (kg),Beef,Tralee,27,27,48.0,2026-07-01
+SKU-5043,Fillet Steak (kg),Beef,Clonmel,12,17,48.0,2026-05-01
+SKU-5044,Fillet Steak (kg),Beef,Clonmel,39,39,48.0,2026-06-01
+SKU-5045,Fillet Steak (kg),Beef,Clonmel,34,35,48.0,2026-07-01
+SKU-5046,Round Steak (kg),Beef,Blanchardstown,8,7,13.5,2026-05-01
+SKU-5047,Round Steak (kg),Beef,Blanchardstown,26,26,13.5,2026-06-01
+SKU-5048,Round Steak (kg),Beef,Blanchardstown,45,45,13.5,2026-07-01
+SKU-5049,Round Steak (kg),Beef,Tralee,23,22,13.5,2026-05-01
+SKU-5050,Round Steak (kg),Beef,Tralee,14,14,13.5,2026-06-01
+SKU-5051,Round Steak (kg),Beef,Tralee,31,28,13.5,2026-07-01
+SKU-5052,Round Steak (kg),Beef,Swords,38,37,13.5,2026-05-01
+SKU-5053,Round Steak (kg),Beef,Swords,32,32,13.5,2026-06-01
+SKU-5054,Round Steak (kg),Beef,Swords,43,39,13.5,2026-07-01
+SKU-5055,Round Steak (kg),Beef,Clonmel,44,44,13.5,2026-05-01
+SKU-5056,Round Steak (kg),Beef,Clonmel,11,9,13.5,2026-06-01
+SKU-5057,Round Steak (kg),Beef,Clonmel,25,23,13.5,2026-07-01
+SKU-5058,Beef Mince (kg),Beef,Limerick,11,11,9.0,2026-05-01
+SKU-5059,Beef Mince (kg),Beef,Limerick,34,35,9.0,2026-06-01
+SKU-5060,Beef Mince (kg),Beef,Limerick,42,42,9.0,2026-07-01
+SKU-5061,Beef Mince (kg),Beef,Tralee,39,35,9.0,2026-05-01
+SKU-5062,Beef Mince (kg),Beef,Tralee,38,37,9.0,2026-06-01
+SKU-5063,Beef Mince (kg),Beef,Tralee,23,23,9.0,2026-07-01
+SKU-5064,Beef Mince (kg),Beef,Swords,37,30,9.0,2026-05-01
+SKU-5065,Beef Mince (kg),Beef,Swords,28,28,9.0,2026-06-01
+SKU-5066,Beef Mince (kg),Beef,Swords,11,11,9.0,2026-07-01
+SKU-5067,Beef Mince (kg),Beef,Cornelscourt,54,55,9.0,2026-05-01
+SKU-5068,Beef Mince (kg),Beef,Cornelscourt,16,14,9.0,2026-06-01
+SKU-5069,Beef Mince (kg),Beef,Cornelscourt,55,55,9.0,2026-07-01
+SKU-5070,Rib Roast (kg),Beef,Blanchardstown,45,45,22.0,2026-05-01
+SKU-5071,Rib Roast (kg),Beef,Blanchardstown,16,15,22.0,2026-06-01
+SKU-5072,Rib Roast (kg),Beef,Blanchardstown,29,30,22.0,2026-07-01
+SKU-5073,Rib Roast (kg),Beef,Tralee,28,24,22.0,2026-05-01
+SKU-5074,Rib Roast (kg),Beef,Tralee,34,34,22.0,2026-06-01
+SKU-5075,Rib Roast (kg),Beef,Tralee,49,48,22.0,2026-07-01
+SKU-5076,Rib Roast (kg),Beef,Clonmel,18,18,22.0,2026-05-01
+SKU-5077,Rib Roast (kg),Beef,Clonmel,53,52,22.0,2026-06-01
+SKU-5078,Rib Roast (kg),Beef,Clonmel,35,35,22.0,2026-07-01
+SKU-5079,Rib Roast (kg),Beef,Swords,29,28,22.0,2026-05-01
+SKU-5080,Rib Roast (kg),Beef,Swords,38,39,22.0,2026-06-01
+SKU-5081,Rib Roast (kg),Beef,Swords,38,37,22.0,2026-07-01
+SKU-5082,Rib Roast (kg),Beef,Naas,46,45,22.0,2026-05-01
+SKU-5083,Rib Roast (kg),Beef,Naas,43,42,22.0,2026-06-01
+SKU-5084,Rib Roast (kg),Beef,Naas,15,15,22.0,2026-07-01
+SKU-5085,Rib Roast (kg),Beef,Limerick,43,43,22.0,2026-05-01
+SKU-5086,Rib Roast (kg),Beef,Limerick,24,23,22.0,2026-06-01
+SKU-5087,Rib Roast (kg),Beef,Limerick,32,31,22.0,2026-07-01
+SKU-5088,Salt-Aged Ribeye (kg),Salt-Aged Beef,Limerick,17,17,42.0,2026-05-01
+SKU-5089,Salt-Aged Ribeye (kg),Salt-Aged Beef,Limerick,35,34,42.0,2026-06-01
+SKU-5090,Salt-Aged Ribeye (kg),Salt-Aged Beef,Limerick,40,39,42.0,2026-07-01
+SKU-5091,Salt-Aged Ribeye (kg),Salt-Aged Beef,Clonmel,32,31,42.0,2026-05-01
+SKU-5092,Salt-Aged Ribeye (kg),Salt-Aged Beef,Clonmel,29,28,42.0,2026-06-01
+SKU-5093,Salt-Aged Ribeye (kg),Salt-Aged Beef,Clonmel,50,49,42.0,2026-07-01
+SKU-5094,Salt-Aged Ribeye (kg),Salt-Aged Beef,Cornelscourt,27,27,42.0,2026-05-01
+SKU-5095,Salt-Aged Ribeye (kg),Salt-Aged Beef,Cornelscourt,55,55,42.0,2026-06-01
+SKU-5096,Salt-Aged Ribeye (kg),Salt-Aged Beef,Cornelscourt,12,11,42.0,2026-07-01
+SKU-5097,Salt-Aged Sirloin (kg),Salt-Aged Beef,Cornelscourt,9,13,39.0,2026-05-01
+SKU-5098,Salt-Aged Sirloin (kg),Salt-Aged Beef,Cornelscourt,44,44,39.0,2026-06-01
+SKU-5099,Salt-Aged Sirloin (kg),Salt-Aged Beef,Cornelscourt,31,30,39.0,2026-07-01
+SKU-5100,Salt-Aged Sirloin (kg),Salt-Aged Beef,Clonmel,41,40,39.0,2026-05-01
+SKU-5101,Salt-Aged Sirloin (kg),Salt-Aged Beef,Clonmel,33,31,39.0,2026-06-01
+SKU-5102,Salt-Aged Sirloin (kg),Salt-Aged Beef,Clonmel,40,40,39.0,2026-07-01
+SKU-5103,Salt-Aged Sirloin (kg),Salt-Aged Beef,Blanchardstown,30,30,39.0,2026-05-01
+SKU-5104,Salt-Aged Sirloin (kg),Salt-Aged Beef,Blanchardstown,33,35,39.0,2026-06-01
+SKU-5105,Salt-Aged Sirloin (kg),Salt-Aged Beef,Blanchardstown,28,29,39.0,2026-07-01
+SKU-5106,Salt-Aged T-Bone (kg),Salt-Aged Beef,Tralee,24,24,38.0,2026-05-01
+SKU-5107,Salt-Aged T-Bone (kg),Salt-Aged Beef,Tralee,21,21,38.0,2026-06-01
+SKU-5108,Salt-Aged T-Bone (kg),Salt-Aged Beef,Tralee,25,24,38.0,2026-07-01
+SKU-5109,Salt-Aged T-Bone (kg),Salt-Aged Beef,Naas,37,38,38.0,2026-05-01
+SKU-5110,Salt-Aged T-Bone (kg),Salt-Aged Beef,Naas,52,52,38.0,2026-06-01
+SKU-5111,Salt-Aged T-Bone (kg),Salt-Aged Beef,Naas,25,24,38.0,2026-07-01
+SKU-5112,Salt-Aged T-Bone (kg),Salt-Aged Beef,Limerick,37,38,38.0,2026-05-01
+SKU-5113,Salt-Aged T-Bone (kg),Salt-Aged Beef,Limerick,20,20,38.0,2026-06-01
+SKU-5114,Salt-Aged T-Bone (kg),Salt-Aged Beef,Limerick,9,8,38.0,2026-07-01
+SKU-5115,Salt-Aged T-Bone (kg),Salt-Aged Beef,Cornelscourt,34,35,38.0,2026-05-01
+SKU-5116,Salt-Aged T-Bone (kg),Salt-Aged Beef,Cornelscourt,39,39,38.0,2026-06-01
+SKU-5117,Salt-Aged T-Bone (kg),Salt-Aged Beef,Cornelscourt,8,8,38.0,2026-07-01
+SKU-5118,Wagyu Striploin (kg),Wagyu,Blanchardstown,6,6,95.0,2026-05-01
+SKU-5119,Wagyu Striploin (kg),Wagyu,Blanchardstown,10,11,95.0,2026-06-01
+SKU-5120,Wagyu Striploin (kg),Wagyu,Blanchardstown,7,6,95.0,2026-07-01
+SKU-5121,Wagyu Striploin (kg),Wagyu,Clonmel,9,8,95.0,2026-05-01
+SKU-5122,Wagyu Striploin (kg),Wagyu,Clonmel,15,17,95.0,2026-06-01
+SKU-5123,Wagyu Striploin (kg),Wagyu,Clonmel,18,18,95.0,2026-07-01
+SKU-5124,Wagyu Striploin (kg),Wagyu,Swords,11,11,95.0,2026-05-01
+SKU-5125,Wagyu Striploin (kg),Wagyu,Swords,12,11,95.0,2026-06-01
+SKU-5126,Wagyu Striploin (kg),Wagyu,Swords,18,15,95.0,2026-07-01
+SKU-5127,Wagyu Striploin (kg),Wagyu,Cornelscourt,6,6,95.0,2026-05-01
+SKU-5128,Wagyu Striploin (kg),Wagyu,Cornelscourt,5,5,95.0,2026-06-01
+SKU-5129,Wagyu Striploin (kg),Wagyu,Cornelscourt,5,4,95.0,2026-07-01
+SKU-5130,Wagyu Burger 4pk,Wagyu,Blanchardstown,8,8,14.0,2026-05-01
+SKU-5131,Wagyu Burger 4pk,Wagyu,Blanchardstown,16,16,14.0,2026-06-01
+SKU-5132,Wagyu Burger 4pk,Wagyu,Blanchardstown,4,4,14.0,2026-07-01
+SKU-5133,Wagyu Burger 4pk,Wagyu,Swords,6,7,14.0,2026-05-01
+SKU-5134,Wagyu Burger 4pk,Wagyu,Swords,12,12,14.0,2026-06-01
+SKU-5135,Wagyu Burger 4pk,Wagyu,Swords,5,3,14.0,2026-07-01
+SKU-5136,Wagyu Burger 4pk,Wagyu,Cornelscourt,8,7,14.0,2026-05-01
+SKU-5137,Wagyu Burger 4pk,Wagyu,Cornelscourt,17,17,14.0,2026-06-01
+SKU-5138,Wagyu Burger 4pk,Wagyu,Cornelscourt,18,19,14.0,2026-07-01
+SKU-5139,Lamb Chops (kg),Lamb,Limerick,44,44,19.0,2026-05-01
+SKU-5140,Lamb Chops (kg),Lamb,Limerick,52,52,19.0,2026-06-01
+SKU-5141,Lamb Chops (kg),Lamb,Limerick,47,47,19.0,2026-07-01
+SKU-5142,Lamb Chops (kg),Lamb,Tralee,37,32,19.0,2026-05-01
+SKU-5143,Lamb Chops (kg),Lamb,Tralee,15,14,19.0,2026-06-01
+SKU-5144,Lamb Chops (kg),Lamb,Tralee,13,12,19.0,2026-07-01
+SKU-5145,Lamb Chops (kg),Lamb,Naas,50,48,19.0,2026-05-01
+SKU-5146,Lamb Chops (kg),Lamb,Naas,30,30,19.0,2026-06-01
+SKU-5147,Lamb Chops (kg),Lamb,Naas,17,17,19.0,2026-07-01
+SKU-5148,Lamb Chops (kg),Lamb,Cornelscourt,23,23,19.0,2026-05-01
+SKU-5149,Lamb Chops (kg),Lamb,Cornelscourt,55,53,19.0,2026-06-01
+SKU-5150,Lamb Chops (kg),Lamb,Cornelscourt,20,19,19.0,2026-07-01
+SKU-5151,Leg of Lamb (kg),Lamb,Blanchardstown,28,29,17.0,2026-05-01
+SKU-5152,Leg of Lamb (kg),Lamb,Blanchardstown,44,43,17.0,2026-06-01
+SKU-5153,Leg of Lamb (kg),Lamb,Blanchardstown,42,42,17.0,2026-07-01
+SKU-5154,Leg of Lamb (kg),Lamb,Swords,43,43,17.0,2026-05-01
+SKU-5155,Leg of Lamb (kg),Lamb,Swords,41,40,17.0,2026-06-01
+SKU-5156,Leg of Lamb (kg),Lamb,Swords,52,51,17.0,2026-07-01
+SKU-5157,Leg of Lamb (kg),Lamb,Tralee,24,25,17.0,2026-05-01
+SKU-5158,Leg of Lamb (kg),Lamb,Tralee,45,43,17.0,2026-06-01
+SKU-5159,Leg of Lamb (kg),Lamb,Tralee,21,25,17.0,2026-07-01
+SKU-5160,Leg of Lamb (kg),Lamb,Rathmines,12,11,17.0,2026-05-01
+SKU-5161,Leg of Lamb (kg),Lamb,Rathmines,31,31,17.0,2026-06-01
+SKU-5162,Leg of Lamb (kg),Lamb,Rathmines,54,46,17.0,2026-07-01
+SKU-5163,Leg of Lamb (kg),Lamb,Limerick,13,13,17.0,2026-05-01
+SKU-5164,Leg of Lamb (kg),Lamb,Limerick,34,35,17.0,2026-06-01
+SKU-5165,Leg of Lamb (kg),Lamb,Limerick,35,35,17.0,2026-07-01
+SKU-5166,Leg of Lamb (kg),Lamb,Clonmel,14,14,17.0,2026-05-01
+SKU-5167,Leg of Lamb (kg),Lamb,Clonmel,22,21,17.0,2026-06-01
+SKU-5168,Leg of Lamb (kg),Lamb,Clonmel,13,14,17.0,2026-07-01
+SKU-5169,Rack of Lamb (kg),Lamb,Blanchardstown,30,30,26.0,2026-05-01
+SKU-5170,Rack of Lamb (kg),Lamb,Blanchardstown,40,40,26.0,2026-06-01
+SKU-5171,Rack of Lamb (kg),Lamb,Blanchardstown,9,9,26.0,2026-07-01
+SKU-5172,Rack of Lamb (kg),Lamb,Limerick,29,29,26.0,2026-05-01
+SKU-5173,Rack of Lamb (kg),Lamb,Limerick,49,47,26.0,2026-06-01
+SKU-5174,Rack of Lamb (kg),Lamb,Limerick,26,25,26.0,2026-07-01
+SKU-5175,Rack of Lamb (kg),Lamb,Cornelscourt,49,43,26.0,2026-05-01
+SKU-5176,Rack of Lamb (kg),Lamb,Cornelscourt,18,17,26.0,2026-06-01
+SKU-5177,Rack of Lamb (kg),Lamb,Cornelscourt,20,20,26.0,2026-07-01
+SKU-5178,Rack of Lamb (kg),Lamb,Clonmel,52,51,26.0,2026-05-01
+SKU-5179,Rack of Lamb (kg),Lamb,Clonmel,19,17,26.0,2026-06-01
+SKU-5180,Rack of Lamb (kg),Lamb,Clonmel,16,16,26.0,2026-07-01
+SKU-5181,Rack of Lamb (kg),Lamb,Naas,51,51,26.0,2026-05-01
+SKU-5182,Rack of Lamb (kg),Lamb,Naas,31,29,26.0,2026-06-01
+SKU-5183,Rack of Lamb (kg),Lamb,Naas,27,27,26.0,2026-07-01
+SKU-5184,Rack of Lamb (kg),Lamb,Swords,31,31,26.0,2026-05-01
+SKU-5185,Rack of Lamb (kg),Lamb,Swords,9,9,26.0,2026-06-01
+SKU-5186,Rack of Lamb (kg),Lamb,Swords,49,48,26.0,2026-07-01
+SKU-5187,Lamb Mince (kg),Lamb,Tralee,16,17,12.0,2026-05-01
+SKU-5188,Lamb Mince (kg),Lamb,Tralee,20,19,12.0,2026-06-01
+SKU-5189,Lamb Mince (kg),Lamb,Tralee,46,44,12.0,2026-07-01
+SKU-5190,Lamb Mince (kg),Lamb,Cornelscourt,24,23,12.0,2026-05-01
+SKU-5191,Lamb Mince (kg),Lamb,Cornelscourt,42,39,12.0,2026-06-01
+SKU-5192,Lamb Mince (kg),Lamb,Cornelscourt,46,45,12.0,2026-07-01
+SKU-5193,Lamb Mince (kg),Lamb,Rathmines,44,43,12.0,2026-05-01
+SKU-5194,Lamb Mince (kg),Lamb,Rathmines,55,55,12.0,2026-06-01
+SKU-5195,Lamb Mince (kg),Lamb,Rathmines,8,13,12.0,2026-07-01
+SKU-5196,Lamb Mince (kg),Lamb,Swords,11,10,12.0,2026-05-01
+SKU-5197,Lamb Mince (kg),Lamb,Swords,19,18,12.0,2026-06-01
+SKU-5198,Lamb Mince (kg),Lamb,Swords,45,45,12.0,2026-07-01
+SKU-5199,Lamb Mince (kg),Lamb,Naas,52,52,12.0,2026-05-01
+SKU-5200,Lamb Mince (kg),Lamb,Naas,16,15,12.0,2026-06-01
+SKU-5201,Lamb Mince (kg),Lamb,Naas,8,9,12.0,2026-07-01
+SKU-5202,Pork Chops (kg),Pork,Cornelscourt,39,38,10.0,2026-05-01
+SKU-5203,Pork Chops (kg),Pork,Cornelscourt,55,59,10.0,2026-06-01
+SKU-5204,Pork Chops (kg),Pork,Cornelscourt,55,47,10.0,2026-07-01
+SKU-5205,Pork Chops (kg),Pork,Rathmines,30,29,10.0,2026-05-01
+SKU-5206,Pork Chops (kg),Pork,Rathmines,11,16,10.0,2026-06-01
+SKU-5207,Pork Chops (kg),Pork,Rathmines,49,48,10.0,2026-07-01
+SKU-5208,Pork Chops (kg),Pork,Naas,40,40,10.0,2026-05-01
+SKU-5209,Pork Chops (kg),Pork,Naas,34,31,10.0,2026-06-01
+SKU-5210,Pork Chops (kg),Pork,Naas,22,23,10.0,2026-07-01
+SKU-5211,Pork Chops (kg),Pork,Blanchardstown,42,42,10.0,2026-05-01
+SKU-5212,Pork Chops (kg),Pork,Blanchardstown,47,48,10.0,2026-06-01
+SKU-5213,Pork Chops (kg),Pork,Blanchardstown,16,15,10.0,2026-07-01
+SKU-5214,Pork Chops (kg),Pork,Clonmel,9,9,10.0,2026-05-01
+SKU-5215,Pork Chops (kg),Pork,Clonmel,32,30,10.0,2026-06-01
+SKU-5216,Pork Chops (kg),Pork,Clonmel,41,42,10.0,2026-07-01
+SKU-5217,Pork Belly (kg),Pork,Naas,13,11,11.5,2026-05-01
+SKU-5218,Pork Belly (kg),Pork,Naas,42,47,11.5,2026-06-01
+SKU-5219,Pork Belly (kg),Pork,Naas,36,36,11.5,2026-07-01
+SKU-5220,Pork Belly (kg),Pork,Swords,21,19,11.5,2026-05-01
+SKU-5221,Pork Belly (kg),Pork,Swords,53,53,11.5,2026-06-01
+SKU-5222,Pork Belly (kg),Pork,Swords,32,31,11.5,2026-07-01
+SKU-5223,Pork Belly (kg),Pork,Limerick,51,51,11.5,2026-05-01
+SKU-5224,Pork Belly (kg),Pork,Limerick,30,30,11.5,2026-06-01
+SKU-5225,Pork Belly (kg),Pork,Limerick,46,44,11.5,2026-07-01
+SKU-5226,Pork Belly (kg),Pork,Blanchardstown,20,20,11.5,2026-05-01
+SKU-5227,Pork Belly (kg),Pork,Blanchardstown,54,52,11.5,2026-06-01
+SKU-5228,Pork Belly (kg),Pork,Blanchardstown,24,24,11.5,2026-07-01
+SKU-5229,Pork Belly (kg),Pork,Cornelscourt,10,9,11.5,2026-05-01
+SKU-5230,Pork Belly (kg),Pork,Cornelscourt,30,26,11.5,2026-06-01
+SKU-5231,Pork Belly (kg),Pork,Cornelscourt,34,33,11.5,2026-07-01
+SKU-5232,Pork Sausages (kg),Pork,Rathmines,25,21,8.0,2026-05-01
+SKU-5233,Pork Sausages (kg),Pork,Rathmines,29,28,8.0,2026-06-01
+SKU-5234,Pork Sausages (kg),Pork,Rathmines,16,15,8.0,2026-07-01
+SKU-5235,Pork Sausages (kg),Pork,Tralee,25,25,8.0,2026-05-01
+SKU-5236,Pork Sausages (kg),Pork,Tralee,46,47,8.0,2026-06-01
+SKU-5237,Pork Sausages (kg),Pork,Tralee,38,37,8.0,2026-07-01
+SKU-5238,Pork Sausages (kg),Pork,Naas,15,15,8.0,2026-05-01
+SKU-5239,Pork Sausages (kg),Pork,Naas,22,21,8.0,2026-06-01
+SKU-5240,Pork Sausages (kg),Pork,Naas,13,13,8.0,2026-07-01
+SKU-5241,Pork Sausages (kg),Pork,Blanchardstown,17,18,8.0,2026-05-01
+SKU-5242,Pork Sausages (kg),Pork,Blanchardstown,37,43,8.0,2026-06-01
+SKU-5243,Pork Sausages (kg),Pork,Blanchardstown,25,20,8.0,2026-07-01
+SKU-5244,Pork Fillet (kg),Pork,Clonmel,36,35,14.0,2026-05-01
+SKU-5245,Pork Fillet (kg),Pork,Clonmel,9,10,14.0,2026-06-01
+SKU-5246,Pork Fillet (kg),Pork,Clonmel,47,43,14.0,2026-07-01
+SKU-5247,Pork Fillet (kg),Pork,Rathmines,27,27,14.0,2026-05-01
+SKU-5248,Pork Fillet (kg),Pork,Rathmines,15,15,14.0,2026-06-01
+SKU-5249,Pork Fillet (kg),Pork,Rathmines,30,30,14.0,2026-07-01
+SKU-5250,Pork Fillet (kg),Pork,Naas,20,22,14.0,2026-05-01
+SKU-5251,Pork Fillet (kg),Pork,Naas,35,33,14.0,2026-06-01
+SKU-5252,Pork Fillet (kg),Pork,Naas,9,9,14.0,2026-07-01
+SKU-5253,Pork Fillet (kg),Pork,Tralee,34,34,14.0,2026-05-01
+SKU-5254,Pork Fillet (kg),Pork,Tralee,50,46,14.0,2026-06-01
+SKU-5255,Pork Fillet (kg),Pork,Tralee,29,28,14.0,2026-07-01
+SKU-5256,Whole Chicken (ea),Poultry,Tralee,69,71,7.5,2026-05-01
+SKU-5257,Whole Chicken (ea),Poultry,Tralee,36,37,7.5,2026-06-01
+SKU-5258,Whole Chicken (ea),Poultry,Tralee,71,71,7.5,2026-07-01
+SKU-5259,Whole Chicken (ea),Poultry,Cornelscourt,55,54,7.5,2026-05-01
+SKU-5260,Whole Chicken (ea),Poultry,Cornelscourt,34,32,7.5,2026-06-01
+SKU-5261,Whole Chicken (ea),Poultry,Cornelscourt,43,42,7.5,2026-07-01
+SKU-5262,Whole Chicken (ea),Poultry,Swords,52,52,7.5,2026-05-01
+SKU-5263,Whole Chicken (ea),Poultry,Swords,27,28,7.5,2026-06-01
+SKU-5264,Whole Chicken (ea),Poultry,Swords,40,41,7.5,2026-07-01
+SKU-5265,Whole Chicken (ea),Poultry,Rathmines,49,49,7.5,2026-05-01
+SKU-5266,Whole Chicken (ea),Poultry,Rathmines,31,31,7.5,2026-06-01
+SKU-5267,Whole Chicken (ea),Poultry,Rathmines,52,52,7.5,2026-07-01
+SKU-5268,Whole Chicken (ea),Poultry,Blanchardstown,48,40,7.5,2026-05-01
+SKU-5269,Whole Chicken (ea),Poultry,Blanchardstown,75,59,7.5,2026-06-01
+SKU-5270,Whole Chicken (ea),Poultry,Blanchardstown,75,75,7.5,2026-07-01
+SKU-5271,Whole Chicken (ea),Poultry,Clonmel,12,12,7.5,2026-05-01
+SKU-5272,Whole Chicken (ea),Poultry,Clonmel,53,53,7.5,2026-06-01
+SKU-5273,Whole Chicken (ea),Poultry,Clonmel,72,67,7.5,2026-07-01
+SKU-5274,Chicken Fillets (kg),Poultry,Limerick,16,16,10.5,2026-05-01
+SKU-5275,Chicken Fillets (kg),Poultry,Limerick,9,8,10.5,2026-06-01
+SKU-5276,Chicken Fillets (kg),Poultry,Limerick,51,50,10.5,2026-07-01
+SKU-5277,Chicken Fillets (kg),Poultry,Tralee,44,44,10.5,2026-05-01
+SKU-5278,Chicken Fillets (kg),Poultry,Tralee,12,12,10.5,2026-06-01
+SKU-5279,Chicken Fillets (kg),Poultry,Tralee,24,24,10.5,2026-07-01
+SKU-5280,Chicken Fillets (kg),Poultry,Swords,18,18,10.5,2026-05-01
+SKU-5281,Chicken Fillets (kg),Poultry,Swords,55,56,10.5,2026-06-01
+SKU-5282,Chicken Fillets (kg),Poultry,Swords,53,52,10.5,2026-07-01
+SKU-5283,Chicken Fillets (kg),Poultry,Clonmel,28,29,10.5,2026-05-01
+SKU-5284,Chicken Fillets (kg),Poultry,Clonmel,16,17,10.5,2026-06-01
+SKU-5285,Chicken Fillets (kg),Poultry,Clonmel,38,38,10.5,2026-07-01
+SKU-5286,Chicken Wings (kg),Poultry,Rathmines,23,23,6.5,2026-05-01
+SKU-5287,Chicken Wings (kg),Poultry,Rathmines,51,51,6.5,2026-06-01
+SKU-5288,Chicken Wings (kg),Poultry,Rathmines,55,49,6.5,2026-07-01
+SKU-5289,Chicken Wings (kg),Poultry,Naas,24,23,6.5,2026-05-01
+SKU-5290,Chicken Wings (kg),Poultry,Naas,29,29,6.5,2026-06-01
+SKU-5291,Chicken Wings (kg),Poultry,Naas,22,21,6.5,2026-07-01
+SKU-5292,Chicken Wings (kg),Poultry,Cornelscourt,26,26,6.5,2026-05-01
+SKU-5293,Chicken Wings (kg),Poultry,Cornelscourt,39,39,6.5,2026-06-01
+SKU-5294,Chicken Wings (kg),Poultry,Cornelscourt,29,28,6.5,2026-07-01
+SKU-5295,Chicken Wings (kg),Poultry,Swords,15,16,6.5,2026-05-01
+SKU-5296,Chicken Wings (kg),Poultry,Swords,8,8,6.5,2026-06-01
+SKU-5297,Chicken Wings (kg),Poultry,Swords,36,35,6.5,2026-07-01
+SKU-5298,Chicken Wings (kg),Poultry,Limerick,27,27,6.5,2026-05-01
+SKU-5299,Chicken Wings (kg),Poultry,Limerick,46,46,6.5,2026-06-01
+SKU-5300,Chicken Wings (kg),Poultry,Limerick,47,47,6.5,2026-07-01
+SKU-5301,Chicken Wings (kg),Poultry,Blanchardstown,20,20,6.5,2026-05-01
+SKU-5302,Chicken Wings (kg),Poultry,Blanchardstown,54,36,6.5,2026-06-01
+SKU-5303,Chicken Wings (kg),Poultry,Blanchardstown,18,18,6.5,2026-07-01
+SKU-5304,Turkey Crown (kg),Poultry,Clonmel,18,18,16.0,2026-05-01
+SKU-5305,Turkey Crown (kg),Poultry,Clonmel,38,38,16.0,2026-06-01
+SKU-5306,Turkey Crown (kg),Poultry,Clonmel,29,29,16.0,2026-07-01
+SKU-5307,Turkey Crown (kg),Poultry,Limerick,29,29,16.0,2026-05-01
+SKU-5308,Turkey Crown (kg),Poultry,Limerick,20,16,16.0,2026-06-01
+SKU-5309,Turkey Crown (kg),Poultry,Limerick,11,9,16.0,2026-07-01
+SKU-5310,Turkey Crown (kg),Poultry,Tralee,43,42,16.0,2026-05-01
+SKU-5311,Turkey Crown (kg),Poultry,Tralee,23,23,16.0,2026-06-01
+SKU-5312,Turkey Crown (kg),Poultry,Tralee,50,50,16.0,2026-07-01
+SKU-5313,Turkey Crown (kg),Poultry,Rathmines,47,48,16.0,2026-05-01
+SKU-5314,Turkey Crown (kg),Poultry,Rathmines,13,13,16.0,2026-06-01
+SKU-5315,Turkey Crown (kg),Poultry,Rathmines,31,32,16.0,2026-07-01
+SKU-5316,Free-Range Duck (ea),Poultry,Naas,75,75,14.0,2026-05-01
+SKU-5317,Free-Range Duck (ea),Poultry,Naas,44,45,14.0,2026-06-01
+SKU-5318,Free-Range Duck (ea),Poultry,Naas,33,35,14.0,2026-07-01
+SKU-5319,Free-Range Duck (ea),Poultry,Rathmines,39,39,14.0,2026-05-01
+SKU-5320,Free-Range Duck (ea),Poultry,Rathmines,63,64,14.0,2026-06-01
+SKU-5321,Free-Range Duck (ea),Poultry,Rathmines,29,29,14.0,2026-07-01
+SKU-5322,Free-Range Duck (ea),Poultry,Swords,34,34,14.0,2026-05-01
+SKU-5323,Free-Range Duck (ea),Poultry,Swords,54,54,14.0,2026-06-01
+SKU-5324,Free-Range Duck (ea),Poultry,Swords,25,24,14.0,2026-07-01
+SKU-5325,Free-Range Duck (ea),Poultry,Tralee,37,36,14.0,2026-05-01
+SKU-5326,Free-Range Duck (ea),Poultry,Tralee,57,63,14.0,2026-06-01
+SKU-5327,Free-Range Duck (ea),Poultry,Tralee,47,48,14.0,2026-07-01
+SKU-5328,Dry-Cure Rashers (kg),Bacon & Ham,Swords,25,21,13.0,2026-05-01
+SKU-5329,Dry-Cure Rashers (kg),Bacon & Ham,Swords,11,9,13.0,2026-06-01
+SKU-5330,Dry-Cure Rashers (kg),Bacon & Ham,Swords,46,45,13.0,2026-07-01
+SKU-5331,Dry-Cure Rashers (kg),Bacon & Ham,Naas,31,30,13.0,2026-05-01
+SKU-5332,Dry-Cure Rashers (kg),Bacon & Ham,Naas,46,47,13.0,2026-06-01
+SKU-5333,Dry-Cure Rashers (kg),Bacon & Ham,Naas,53,53,13.0,2026-07-01
+SKU-5334,Dry-Cure Rashers (kg),Bacon & Ham,Rathmines,26,23,13.0,2026-05-01
+SKU-5335,Dry-Cure Rashers (kg),Bacon & Ham,Rathmines,10,8,13.0,2026-06-01
+SKU-5336,Dry-Cure Rashers (kg),Bacon & Ham,Rathmines,55,54,13.0,2026-07-01
+SKU-5337,Dry-Cure Rashers (kg),Bacon & Ham,Clonmel,54,52,13.0,2026-05-01
+SKU-5338,Dry-Cure Rashers (kg),Bacon & Ham,Clonmel,19,19,13.0,2026-06-01
+SKU-5339,Dry-Cure Rashers (kg),Bacon & Ham,Clonmel,22,22,13.0,2026-07-01
+SKU-5340,Traditional Ham (kg),Bacon & Ham,Tralee,53,53,15.0,2026-05-01
+SKU-5341,Traditional Ham (kg),Bacon & Ham,Tralee,22,22,15.0,2026-06-01
+SKU-5342,Traditional Ham (kg),Bacon & Ham,Tralee,33,32,15.0,2026-07-01
+SKU-5343,Traditional Ham (kg),Bacon & Ham,Blanchardstown,30,20,15.0,2026-05-01
+SKU-5344,Traditional Ham (kg),Bacon & Ham,Blanchardstown,33,33,15.0,2026-06-01
+SKU-5345,Traditional Ham (kg),Bacon & Ham,Blanchardstown,55,54,15.0,2026-07-01
+SKU-5346,Traditional Ham (kg),Bacon & Ham,Clonmel,50,50,15.0,2026-05-01
+SKU-5347,Traditional Ham (kg),Bacon & Ham,Clonmel,37,36,15.0,2026-06-01
+SKU-5348,Traditional Ham (kg),Bacon & Ham,Clonmel,22,22,15.0,2026-07-01
+SKU-5349,Traditional Ham (kg),Bacon & Ham,Cornelscourt,24,24,15.0,2026-05-01
+SKU-5350,Traditional Ham (kg),Bacon & Ham,Cornelscourt,28,28,15.0,2026-06-01
+SKU-5351,Traditional Ham (kg),Bacon & Ham,Cornelscourt,42,42,15.0,2026-07-01
+SKU-5352,Traditional Ham (kg),Bacon & Ham,Rathmines,40,35,15.0,2026-05-01
+SKU-5353,Traditional Ham (kg),Bacon & Ham,Rathmines,19,20,15.0,2026-06-01
+SKU-5354,Traditional Ham (kg),Bacon & Ham,Rathmines,39,39,15.0,2026-07-01
+SKU-5355,Traditional Ham (kg),Bacon & Ham,Naas,40,40,15.0,2026-05-01
+SKU-5356,Traditional Ham (kg),Bacon & Ham,Naas,34,33,15.0,2026-06-01
+SKU-5357,Traditional Ham (kg),Bacon & Ham,Naas,35,35,15.0,2026-07-01
+SKU-5358,Black Pudding (kg),Bacon & Ham,Tralee,42,42,8.5,2026-05-01
+SKU-5359,Black Pudding (kg),Bacon & Ham,Tralee,15,15,8.5,2026-06-01
+SKU-5360,Black Pudding (kg),Bacon & Ham,Tralee,42,42,8.5,2026-07-01
+SKU-5361,Black Pudding (kg),Bacon & Ham,Limerick,49,48,8.5,2026-05-01
+SKU-5362,Black Pudding (kg),Bacon & Ham,Limerick,42,41,8.5,2026-06-01
+SKU-5363,Black Pudding (kg),Bacon & Ham,Limerick,22,22,8.5,2026-07-01
+SKU-5364,Black Pudding (kg),Bacon & Ham,Clonmel,31,35,8.5,2026-05-01
+SKU-5365,Black Pudding (kg),Bacon & Ham,Clonmel,24,24,8.5,2026-06-01
+SKU-5366,Black Pudding (kg),Bacon & Ham,Clonmel,34,32,8.5,2026-07-01
+SKU-5367,Black Pudding (kg),Bacon & Ham,Rathmines,39,39,8.5,2026-05-01
+SKU-5368,Black Pudding (kg),Bacon & Ham,Rathmines,28,28,8.5,2026-06-01
+SKU-5369,Black Pudding (kg),Bacon & Ham,Rathmines,16,15,8.5,2026-07-01
+SKU-5370,White Pudding (kg),Bacon & Ham,Limerick,50,49,8.0,2026-05-01
+SKU-5371,White Pudding (kg),Bacon & Ham,Limerick,30,30,8.0,2026-06-01
+SKU-5372,White Pudding (kg),Bacon & Ham,Limerick,53,53,8.0,2026-07-01
+SKU-5373,White Pudding (kg),Bacon & Ham,Swords,43,43,8.0,2026-05-01
+SKU-5374,White Pudding (kg),Bacon & Ham,Swords,53,57,8.0,2026-06-01
+SKU-5375,White Pudding (kg),Bacon & Ham,Swords,36,31,8.0,2026-07-01
+SKU-5376,White Pudding (kg),Bacon & Ham,Tralee,16,15,8.0,2026-05-01
+SKU-5377,White Pudding (kg),Bacon & Ham,Tralee,17,17,8.0,2026-06-01
+SKU-5378,White Pudding (kg),Bacon & Ham,Tralee,37,37,8.0,2026-07-01
+SKU-5379,White Pudding (kg),Bacon & Ham,Rathmines,9,8,8.0,2026-05-01
+SKU-5380,White Pudding (kg),Bacon & Ham,Rathmines,23,22,8.0,2026-06-01
+SKU-5381,White Pudding (kg),Bacon & Ham,Rathmines,42,42,8.0,2026-07-01
+SKU-5382,White Pudding (kg),Bacon & Ham,Blanchardstown,54,55,8.0,2026-05-01
+SKU-5383,White Pudding (kg),Bacon & Ham,Blanchardstown,52,52,8.0,2026-06-01
+SKU-5384,White Pudding (kg),Bacon & Ham,Blanchardstown,51,51,8.0,2026-07-01
+SKU-5385,White Pudding (kg),Bacon & Ham,Clonmel,25,24,8.0,2026-05-01
+SKU-5386,White Pudding (kg),Bacon & Ham,Clonmel,39,39,8.0,2026-06-01
+SKU-5387,White Pudding (kg),Bacon & Ham,Clonmel,24,24,8.0,2026-07-01
+SKU-5388,Spiced Beef (kg),Bacon & Ham,Naas,44,49,17.0,2026-05-01
+SKU-5389,Spiced Beef (kg),Bacon & Ham,Naas,34,34,17.0,2026-06-01
+SKU-5390,Spiced Beef (kg),Bacon & Ham,Naas,27,26,17.0,2026-07-01
+SKU-5391,Spiced Beef (kg),Bacon & Ham,Blanchardstown,48,46,17.0,2026-05-01
+SKU-5392,Spiced Beef (kg),Bacon & Ham,Blanchardstown,24,24,17.0,2026-06-01
+SKU-5393,Spiced Beef (kg),Bacon & Ham,Blanchardstown,51,51,17.0,2026-07-01
+SKU-5394,Spiced Beef (kg),Bacon & Ham,Rathmines,49,48,17.0,2026-05-01
+SKU-5395,Spiced Beef (kg),Bacon & Ham,Rathmines,43,44,17.0,2026-06-01
+SKU-5396,Spiced Beef (kg),Bacon & Ham,Rathmines,11,14,17.0,2026-07-01
+SKU-5397,Spiced Beef (kg),Bacon & Ham,Tralee,50,49,17.0,2026-05-01
+SKU-5398,Spiced Beef (kg),Bacon & Ham,Tralee,25,25,17.0,2026-06-01
+SKU-5399,Spiced Beef (kg),Bacon & Ham,Tralee,34,31,17.0,2026-07-01
+SKU-5400,Spiced Beef (kg),Bacon & Ham,Clonmel,55,54,17.0,2026-05-01
+SKU-5401,Spiced Beef (kg),Bacon & Ham,Clonmel,24,24,17.0,2026-06-01
+SKU-5402,Spiced Beef (kg),Bacon & Ham,Clonmel,19,19,17.0,2026-07-01
+SKU-5403,Spiced Beef (kg),Bacon & Ham,Cornelscourt,49,45,17.0,2026-05-01
+SKU-5404,Spiced Beef (kg),Bacon & Ham,Cornelscourt,40,40,17.0,2026-06-01
+SKU-5405,Spiced Beef (kg),Bacon & Ham,Cornelscourt,30,30,17.0,2026-07-01

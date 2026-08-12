@@ -17,6 +17,7 @@ and a manager-ready briefing drafted by Claude.
 - **Multi-period trends** — accuracy and value-at-risk over time, plus a
   "recurring shortage products" table that flags items short across multiple
   counts (the strongest genuine-shrinkage signal)
+- **Operations tab** — shrinkage benchmarked against 3%/5% retail thresholds with green/amber/red status by shop and category; a worsening-products list that flags losses growing across count dates; and a low-stock risk list of items sitting well below their usual level
 - **Anomaly detection** — statistical outliers via the 1.5xIQR rule
 - **AI executive briefing** — Claude reads the *computed statistics* (never raw
   rows) and drafts findings + prioritised recommendations, downloadable as
@@ -53,24 +54,20 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Enabling the AI briefing
+## Enabling the AI briefing (optional, free)
 
-The AI tab needs an Anthropic API key. The app looks for it in Streamlit
-secrets first, then the `ANTHROPIC_API_KEY` environment variable.
+The AI tab uses Google Gemini, which has a free tier. Every other tab works without it.
 
-**Locally:**
-```bash
-export ANTHROPIC_API_KEY="sk-ant-..."   # Windows: set ANTHROPIC_API_KEY=...
-streamlit run app.py
-```
+1. Get a free API key at https://aistudio.google.com/app/apikey
+2. **Locally:** `export GEMINI_API_KEY="your-key"` (Windows: `set GEMINI_API_KEY=your-key`), then run the app.
+3. **On Streamlit Cloud:** open the app, go to **Settings → Secrets**, and add:
+   ```toml
+   GEMINI_API_KEY = "your-key"
+   ```
+   Save; the app restarts with the AI feature enabled.
 
-**On Streamlit Community Cloud:** open your app, click the three-dot menu >
-**Settings** > **Secrets**, and add:
-```toml
-ANTHROPIC_API_KEY = "sk-ant-..."
-```
-Save; the app restarts with AI features enabled. Get a key from
-console.anthropic.com. The rest of the dashboard works without a key.
+Free-tier note: Google rate-limits free usage and may use submitted prompts to improve their models, so avoid sending real confidential data through the free tier. The bundled sample data is synthetic, so it's safe.
+
 
 ## Tests
 
