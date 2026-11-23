@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 
 import pandas as pd
 import requests
@@ -143,36 +144,80 @@ def _post(model: str, api_key: str, payload: dict) -> requests.Response:
     return requests.post(url, params={"key": api_key}, json=payload, timeout=TIMEOUT)
 
 
+# Status codes that mean "Google is busy or overloaded right now, try again":
+# 429 = too many requests, 500/502/503/504 = temporary server problems.
+BUSY_CODES = {429, 500, 502, 503, 504}
+RETRIES_PER_MODEL = 2      # how many times to try each model
+WAIT_SECONDS = 2           # pause between tries, doubled each time
+
+
+def _error_detail(resp: requests.Response) -> str:
+    try:
+        return resp.json().get("error", {}).get("message", "") or "unknown error"
+    except Exception:
+        return resp.text[:300] or "unknown error"
+
+
 def _call_gemini(api_key: str, system: str, user: str, max_tokens: int) -> str:
-    """Low-level Gemini REST call with model auto-discovery. Raises RuntimeError."""
+    """
+    Call Gemini and return its text. Raises RuntimeError with a plain message.
+
+    If a model is busy (for example error 503), wait a moment and try again,
+    then move on to the next backup model in FALLBACK_MODELS. Problems that
+    retrying cannot fix, such as an invalid API key, stop straight away.
+    """
     payload = {
         "system_instruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": user}]}],
         "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.4},
     }
 
-    try:
-        resp = _post(MODEL, api_key, payload)
-    except requests.RequestException as e:
-        raise RuntimeError(f"Network error contacting Gemini: {e}") from e
+    models_to_try = [MODEL] + [m for m in FALLBACK_MODELS if m != MODEL]
+    discovered = False
+    last_problem = ""
+    resp = None
 
-    # If the model name is wrong (404), discover a working one and retry once.
-    if resp.status_code == 404:
-        alt = _discover_model(api_key)
-        if alt:
+    i = 0
+    while i < len(models_to_try):
+        model = models_to_try[i]
+        i += 1
+        for attempt in range(RETRIES_PER_MODEL):
             try:
-                resp = _post(alt, api_key, payload)
+                resp = _post(model, api_key, payload)
             except requests.RequestException as e:
-                raise RuntimeError(f"Network error contacting Gemini: {e}") from e
+                last_problem = f"network error: {e}"
+                time.sleep(WAIT_SECONDS * (attempt + 1))
+                continue
 
-    if resp.status_code != 200:
-        detail = ""
-        try:
-            detail = resp.json().get("error", {}).get("message", "")
-        except Exception:
-            detail = resp.text[:300]
+            if resp.status_code == 200:
+                break
+            if resp.status_code in BUSY_CODES:
+                last_problem = f"{model} is busy ({resp.status_code})"
+                time.sleep(WAIT_SECONDS * (attempt + 1))
+                continue
+            if resp.status_code == 404:
+                # This model name doesn't exist (any more). Ask Google once
+                # which models are available and add one to the list.
+                last_problem = f"{model} not found"
+                if not discovered:
+                    discovered = True
+                    alt = _discover_model(api_key)
+                    if alt and alt not in models_to_try:
+                        models_to_try.append(alt)
+                break
+            # Anything else (bad key, no permission, bad request) won't be
+            # fixed by retrying, so stop and explain.
+            raise RuntimeError(
+                f"Gemini API returned {resp.status_code}: {_error_detail(resp)}"
+            )
+        if resp is not None and resp.status_code == 200:
+            break
+
+    if resp is None or resp.status_code != 200:
         raise RuntimeError(
-            f"Gemini API returned {resp.status_code}: {detail or 'unknown error'}"
+            "Google's Gemini service is busy right now, so the AI could not answer. "
+            "This is usually temporary: please wait a minute and try again. "
+            f"(Last problem: {last_problem})"
         )
 
     data = resp.json()
