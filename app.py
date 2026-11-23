@@ -21,16 +21,38 @@ from analytics import (
     compute_variance,
     detect_anomalies,
     has_multiple_periods,
+    movers_and_underperformers,
+    period_comparison,
+    powerbi_tables,
     recurring_offenders,
     shrinkage_by_dimension,
     shrinkage_metrics,
     shrinkage_trajectory,
     stockout_risk,
+    store_scorecard,
     summary_metrics,
+    tables_to_zip,
     top_discrepancies,
     variance_by_dimension,
 )
 import ai_analyst
+
+
+# --------------------------------------------------------------------------- #
+# Money formatting: every amount is shown in euro, with the minus sign first
+# (for example -€120 rather than €-120) so it reads naturally.
+# --------------------------------------------------------------------------- #
+def euro(value: float, decimals: int = 0) -> str:
+    sign = "-" if value < 0 else ""
+    return f"{sign}€{abs(value):,.{decimals}f}"
+
+
+def EURO0(value):  # whole euros, used in tables
+    return euro(value, 0)
+
+
+def EURO2(value):  # euros and cents, used in tables
+    return euro(value, 2)
 
 # --------------------------------------------------------------------------- #
 # Page config + styling
@@ -258,11 +280,39 @@ if only_flagged:
     mask &= df["is_anomaly"]
 view = df[mask].copy()
 
+# If the filters leave nothing to show, say so clearly instead of showing errors.
+if view.empty:
+    st.title("Inventory Stock-Take Analytics")
+    st.warning("No rows match the current filters. Select at least one category, "
+               "location and count date in the sidebar.")
+    st.stop()
+
 # --------------------------------------------------------------------------- #
 # Header + KPIs
 # --------------------------------------------------------------------------- #
 st.title("Inventory Stock-Take Analytics")
 st.caption(f"Source: **{source_label}**  ·  {len(view):,} of {len(df):,} rows in view")
+
+with st.expander("New here? How to read this dashboard"):
+    st.markdown(
+        """
+**What this shows:** at every stock take we compare what the system says
+should be on the shelf (**expected**) with what was actually counted (**counted**).
+
+- **Variance** = counted minus expected. A minus number means stock is missing.
+- **Shrinkage / loss** = the money value of missing stock (units short x unit cost).
+- **Surplus** = more stock found than expected, usually a delivery or counting mistake.
+- **Count accuracy** = the share of products where the count matched exactly.
+- **Traffic lights:** 🟢 under 3% of stock value lost, 🟡 3 to 5%, 🔴 over 5%
+  (fresh-meat retail typically runs at 2 to 5%).
+
+**Where to start:** use the filters on the left to pick shops, categories and
+dates. Open **Store Scorecard** to see how each shop is doing, then
+**Movers & Underperformers** to see what changed since the last stock take.
+
+*The sample dataset is made-up demo data modelled on a butcher's shop, not real figures.*
+        """
+    )
 
 m = summary_metrics(view)
 s = shrinkage_metrics(view)
@@ -276,12 +326,12 @@ c1.markdown(
                 accent=BRASS, recon=(tot_expected, tot_counted)),
     unsafe_allow_html=True,
 )
-c2.markdown(metric_card("Shrinkage (losses)", f"${abs(s['shrinkage_value']):,.0f}",
+c2.markdown(metric_card("Shrinkage (losses)", f"€{abs(s['shrinkage_value']):,.0f}",
                         f"{s['shrinkage_pct_of_stock']:.1f}% of stock value",
                         accent=LOSS), unsafe_allow_html=True)
-c3.markdown(metric_card("Net value variance", f"${m['net_value']:,.0f}",
+c3.markdown(metric_card("Net value variance", euro(m['net_value']),
                         "counted minus expected", accent=net_color), unsafe_allow_html=True)
-c4.markdown(metric_card("Value at risk", f"${m['abs_value']:,.0f}",
+c4.markdown(metric_card("Value at risk", f"€{m['abs_value']:,.0f}",
                         f"{m['anomalies']} anomalies flagged", accent=BRASS),
             unsafe_allow_html=True)
 
@@ -290,9 +340,121 @@ st.divider()
 # --------------------------------------------------------------------------- #
 # Tabs
 # --------------------------------------------------------------------------- #
-tab_overview, tab_trends, tab_shrink, tab_ops, tab_anoms, tab_ai, tab_data = st.tabs(
-    ["Overview", "Trends", "Shrinkage", "Operations", "Anomalies", "AI Briefing", "Data"]
+(tab_overview, tab_score, tab_movers, tab_trends, tab_shrink, tab_ops,
+ tab_anoms, tab_ai, tab_data) = st.tabs(
+    ["Overview", "Store Scorecard", "Movers & Underperformers", "Trends",
+     "Shrinkage", "Operations", "Anomalies", "AI Briefing", "Data"]
 )
+
+STATUS_LABEL = {"green": "🟢 On target", "amber": "🟡 Watch", "red": "🔴 Investigate"}
+
+# ---- Store Scorecard ------------------------------------------------------ #
+with tab_score:
+    st.subheader("Store scorecard")
+    st.caption("One line per shop with the key numbers side by side, worst first. "
+               "Loss % is the money lost on missing stock as a share of the shop's "
+               "expected stock value.")
+    score = store_scorecard(view)
+    if score.empty:
+        st.info("No data in the current view. Widen the filters on the left.")
+    else:
+        red_shops = int((score["status"] == "red").sum())
+        amber_shops = int((score["status"] == "amber").sum())
+        green_shops = int((score["status"] == "green").sum())
+        s1, s2, s3 = st.columns(3)
+        s1.markdown(metric_card("Investigate", f"{red_shops}", "shops over 5% loss",
+                                accent=LOSS), unsafe_allow_html=True)
+        s2.markdown(metric_card("Watch", f"{amber_shops}", "shops at 3 to 5% loss",
+                                accent=BRASS), unsafe_allow_html=True)
+        s3.markdown(metric_card("On target", f"{green_shops}", "shops under 3% loss",
+                                accent=GAIN), unsafe_allow_html=True)
+        st.write("")
+
+        table = score.copy()
+        table["status"] = table["status"].map(STATUS_LABEL)
+        table = table.rename(columns={
+            "location": "Shop", "items_counted": "Items counted",
+            "count_accuracy_pct": "Count accuracy", "loss_value": "Loss",
+            "loss_pct_of_stock": "Loss % of stock", "surplus_value": "Surplus",
+            "unusual_items": "Unusual items", "status": "Status",
+        })
+        st.dataframe(
+            table.style.format({
+                "Count accuracy": "{:.0f}%", "Loss": EURO0,
+                "Loss % of stock": "{:.1f}%", "Surplus": EURO0,
+            }),
+            use_container_width=True, hide_index=True,
+        )
+        worst = score.iloc[0]
+        st.markdown(
+            f"**In plain words:** {worst['location']} has the highest loss at "
+            f"{worst['loss_pct_of_stock']:.1f}% of stock value "
+            f"({euro(worst['loss_value'])}). "
+            f"{green_shops} of {len(score)} shops are on target."
+        )
+
+# ---- Movers & Underperformers --------------------------------------------- #
+with tab_movers:
+    st.subheader("Movers & underperformers")
+    st.caption("Compares two stock takes product by product. **Movers** are products "
+               "whose losses went down the most; **underperformers** are products "
+               "whose losses went up the most. Change = now minus before.")
+    period_dates = sorted(view["count_date"].dropna().unique())
+    if len(period_dates) < 2:
+        st.info("This needs at least two stock-take dates in the current view. "
+                "Widen the date filter on the left.")
+    else:
+        pick1, pick2 = st.columns(2)
+        current_date = pick1.selectbox("This stock take", period_dates[::-1], index=0)
+        earlier = [d for d in period_dates if d < current_date]
+        if not earlier:
+            st.info("Pick a later stock take so there is an earlier one to compare with.")
+        else:
+            previous_date = pick2.selectbox("Compare with", earlier[::-1], index=0)
+            comparison = period_comparison(view, current_date, previous_date)
+            movers, underperformers = movers_and_underperformers(comparison, n=10)
+
+            better = int((comparison["change"] > 0).sum())
+            worse = int((comparison["change"] < 0).sum())
+            net_change = float(comparison["change"].sum())
+            k1, k2, k3 = st.columns(3)
+            k1.markdown(metric_card("Improved", f"{better}", "products with smaller losses",
+                                    accent=GAIN), unsafe_allow_html=True)
+            k2.markdown(metric_card("Got worse", f"{worse}", "products with bigger losses",
+                                    accent=LOSS), unsafe_allow_html=True)
+            k3.markdown(metric_card("Overall change", euro(net_change),
+                                    "plus = better, minus = worse",
+                                    accent=GAIN if net_change >= 0 else LOSS),
+                        unsafe_allow_html=True)
+            st.write("")
+
+            def show_changes(frame, empty_message):
+                if frame.empty:
+                    st.success(empty_message)
+                    return
+                disp = frame.rename(columns={
+                    "product_name": "Product", "category": "Category",
+                    "before": f"Before ({previous_date})", "now": f"Now ({current_date})",
+                    "change": "Change"})
+                money_cols = [f"Before ({previous_date})", f"Now ({current_date})", "Change"]
+                st.dataframe(disp.style.format({c: EURO0 for c in money_cols}),
+                             use_container_width=True, hide_index=True)
+
+            left, right = st.columns(2)
+            with left:
+                st.markdown("**Top 10 underperformers** (losses went up)")
+                show_changes(underperformers, "No product got worse. Good news.")
+            with right:
+                st.markdown("**Top 10 movers** (losses went down)")
+                show_changes(movers, "No product improved between these dates.")
+
+            if not underperformers.empty:
+                top = underperformers.iloc[0]
+                st.markdown(
+                    f"**In plain words:** the biggest problem since {previous_date} is "
+                    f"**{top['product_name']}**, which is {euro(abs(top['change']))} worse. "
+                    f"That is the first product to check at the next stock take."
+                )
 
 # ---- Overview ------------------------------------------------------------- #
 with tab_overview:
@@ -301,7 +463,7 @@ with tab_overview:
         st.subheader("Value variance by category")
         st.plotly_chart(
             bar(variance_by_dimension(view, "category"), "category",
-                "value_variance", "Value variance ($)"),
+                "value_variance", "Value variance (€)"),
             use_container_width=True,
         )
     with right:
@@ -321,7 +483,7 @@ with tab_overview:
     st.subheader("Value variance by location")
     st.plotly_chart(
         bar(variance_by_dimension(view, "location"), "location",
-            "value_variance", "Value variance ($)", height=320),
+            "value_variance", "Value variance (€)", height=320),
         use_container_width=True,
     )
 
@@ -369,7 +531,7 @@ with tab_trends:
                 "total_units_lost": "Units lost", "locations": "Location(s)",
             })
             st.dataframe(
-                show.style.format({"Shrinkage value": "${:,.2f}"}),
+                show.style.format({"Shrinkage value": EURO2}),
                 use_container_width=True, hide_index=True,
             )
 
@@ -379,9 +541,9 @@ with tab_shrink:
     st.caption("Shortages (counted below expected) point to loss, theft, or spoilage. "
                "Overages usually mean receiving or counting errors.")
     a, b, c = st.columns(3)
-    a.markdown(metric_card("Total shortage value", f"${abs(s['shrinkage_value']):,.0f}",
+    a.markdown(metric_card("Total shortage value", f"€{abs(s['shrinkage_value']):,.0f}",
                            f"{abs(s['shrinkage_units']):,} units short"), unsafe_allow_html=True)
-    b.markdown(metric_card("Total overage value", f"${s['overage_value']:,.0f}",
+    b.markdown(metric_card("Total overage value", f"€{s['overage_value']:,.0f}",
                            f"{s['overage_units']:,} units over"), unsafe_allow_html=True)
     c.markdown(metric_card("Shortage rate", f"{s['shortage_rate']:.0f}%",
                            "of line items short"), unsafe_allow_html=True)
@@ -396,7 +558,7 @@ with tab_shrink:
             st.success("No shortages in view.")
         else:
             st.plotly_chart(bar(sbl, "location", "shrinkage_value",
-                                "Shortage value ($)", height=300), use_container_width=True)
+                                "Shortage value (€)", height=300), use_container_width=True)
     with ccol:
         st.caption("Shortage value by category")
         sbc = shrinkage_by_dimension(view, "category")
@@ -404,7 +566,7 @@ with tab_shrink:
             st.success("No shortages in view.")
         else:
             st.plotly_chart(bar(sbc, "category", "shrinkage_value",
-                                "Shortage value ($)", height=300), use_container_width=True)
+                                "Shortage value (€)", height=300), use_container_width=True)
 
 # ---- Operations ----------------------------------------------------------- #
 with tab_ops:
@@ -429,7 +591,7 @@ with tab_ops:
                 f"font-weight:600;'>{r['shrinkage_pct']:.1f}%</span>"
                 f"<span style='font-family:IBM Plex Mono,monospace;color:{MUTE};"
                 f"font-size:0.8rem;width:110px;text-align:right;'>"
-                f"${abs(r['shrinkage_value']):,.0f} lost</span>"
+                f"€{abs(r['shrinkage_value']):,.0f} lost</span>"
                 f"<span style='color:{col};font-size:0.78rem;width:90px;"
                 f"text-align:right;font-weight:600;'>{status_word[r['status']]}</span>"
                 f"</div>", unsafe_allow_html=True)
@@ -466,11 +628,11 @@ with tab_ops:
             if not worsening.empty:
                 show = worsening.head(12).copy()
                 show["path"] = show["series"].apply(
-                    lambda v: " → ".join(f"${abs(x):,.0f}" for x in v))
+                    lambda v: " → ".join(euro(abs(x)) for x in v))
                 disp = show[["product_name", "path", "change"]].rename(columns={
                     "product_name": "Product", "path": "Loss by period",
                     "change": "Worsened by"})
-                st.dataframe(disp.style.format({"Worsened by": "${:,.0f}"}),
+                st.dataframe(disp.style.format({"Worsened by": EURO0}),
                              use_container_width=True, hide_index=True)
 
     st.divider()
@@ -488,7 +650,7 @@ with tab_ops:
             "product_name": "Product", "category": "Category", "location": "Shop",
             "counted_qty": "In stock", "typical_qty": "Usual level",
             "pct_of_typical": "% of usual", "unit_cost": "Unit cost"})
-        st.dataframe(disp.style.format({"% of usual": "{:.0f}%", "Unit cost": "${:,.2f}",
+        st.dataframe(disp.style.format({"% of usual": "{:.0f}%", "Unit cost": EURO2,
                                         "Usual level": "{:.0f}"}),
                      use_container_width=True, hide_index=True)
     st.caption("Note: a stock-take shows levels, not sales speed. This flags items "
@@ -504,7 +666,7 @@ with tab_anoms:
         st.success("No anomalies in the current view.")
     else:
         st.markdown(metric_card("Flagged items", f"{len(flagged):,}",
-                                f"${flagged['value_variance'].abs().sum():,.0f} absolute value impact"),
+                                f"€{flagged['value_variance'].abs().sum():,.0f} absolute value impact"),
                     unsafe_allow_html=True)
         st.write("")
         show = flagged[["sku", "product_name", "category", "location", "count_date",
@@ -512,14 +674,14 @@ with tab_anoms:
                         "pct_variance", "value_variance"]].sort_values(
             "value_variance", key=abs, ascending=False)
         st.dataframe(show.style.format({"pct_variance": "{:.1f}%",
-                                        "value_variance": "${:,.2f}"}),
+                                        "value_variance": EURO2}),
                      use_container_width=True, hide_index=True)
 
     st.subheader("Largest discrepancies by value")
     top = top_discrepancies(view, n=10)
     fig3 = px.bar(top, x="value_variance", y="product_name", orientation="h",
                   color="value_variance", color_continuous_scale=SCALE,
-                  labels={"value_variance": "Value variance ($)", "product_name": ""},
+                  labels={"value_variance": "Value variance (€)", "product_name": ""},
                   hover_data=["sku", "location", "count_date"])
     fig3.update_layout(plot_bgcolor="white", paper_bgcolor="white",
                        coloraxis_showscale=False, margin=dict(t=10, b=10, l=10, r=10),
@@ -587,14 +749,48 @@ with tab_data:
                     "expected_qty", "counted_qty", "qty_variance", "pct_variance",
                     "unit_cost", "value_variance", "is_anomaly"]]
     st.dataframe(display.style.format({"pct_variance": "{:.1f}%",
-                                       "unit_cost": "${:,.2f}",
-                                       "value_variance": "${:,.2f}"}),
+                                       "unit_cost": EURO2,
+                                       "value_variance": EURO2}),
                  use_container_width=True, hide_index=True)
     st.download_button("Download filtered data (CSV)",
                        data=display.to_csv(index=False).encode("utf-8"),
                        file_name="stockpulse_variance.csv", mime="text/csv")
 
+    st.divider()
+    st.subheader("Export for Power BI")
+    st.caption("Downloads the filtered data as four linked tables (a star schema) "
+               "in one ZIP file, ready to load into Power BI.")
+    if view.empty:
+        st.info("No data in the current view to export.")
+    else:
+        pbi = powerbi_tables(view)
+        st.download_button(
+            "Download for Power BI (ZIP of 4 CSV files)",
+            data=tables_to_zip(pbi),
+            file_name="stockpulse_powerbi.zip", mime="application/zip",
+        )
+        with st.expander("What is inside, and how to load it into Power BI"):
+            st.markdown(
+                f"""
+| File | What it holds | Rows |
+| --- | --- | --- |
+| `fact_stocktake.csv` | The numbers: expected, counted, variance, value | {len(pbi['fact_stocktake']):,} |
+| `dim_product.csv` | One row per product, with its category | {len(pbi['dim_product']):,} |
+| `dim_shop.csv` | One row per shop | {len(pbi['dim_shop']):,} |
+| `dim_date.csv` | One row per stock-take date, with year, month and week | {len(pbi['dim_date']):,} |
+
+**To load it:**
+1. Unzip the file.
+2. In Power BI Desktop choose **Get data → Text/CSV** and load all four files.
+3. In **Model view**, link each `_key` column in `fact_stocktake` to the same
+   column in its table: `product_key` → `dim_product`, `shop_key` → `dim_shop`,
+   `date_key` → `dim_date` (one-to-many).
+4. Build measures on the fact table, for example
+   `Loss = -CALCULATE(SUM(fact_stocktake[value_variance]), fact_stocktake[qty_variance] < 0)`.
+                """
+            )
+
 st.divider()
 st.caption("StockPulse Analytics · variance = counted − expected · "
            "shrinkage = value of shortages · benchmarks graded 3% / 5% · "
-           "anomalies via 1.5×IQR.")
+           "anomalies via 1.5×IQR · all amounts in euro (€) · sample data is illustrative.")

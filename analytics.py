@@ -5,6 +5,9 @@ and aggregation helpers. Pure pandas — no side effects, easy to unit test.
 
 from __future__ import annotations
 
+import io
+import zipfile
+
 import pandas as pd
 
 REQUIRED_COLUMNS = [
@@ -329,3 +332,176 @@ def stockout_risk(df: pd.DataFrame, critical_pct: float = 20.0) -> pd.DataFrame:
         "typical_qty", "pct_of_typical", "unit_cost",
     ]].sort_values("pct_of_typical")
     return at_risk.reset_index(drop=True), latest_date
+
+
+# --------------------------------------------------------------------------- #
+# Store scorecard: one row per shop, the key numbers side by side
+# --------------------------------------------------------------------------- #
+SCORECARD_COLUMNS = [
+    "location", "items_counted", "count_accuracy_pct", "loss_value",
+    "loss_pct_of_stock", "surplus_value", "unusual_items", "status",
+]
+
+
+def store_scorecard(df: pd.DataFrame, amber: float = 3.0, red: float = 5.0) -> pd.DataFrame:
+    """
+    A simple report card for every shop, like a weekly KPI table.
+
+    For each shop:
+      items_counted       how many product lines were counted
+      count_accuracy_pct  % of lines where the count matched exactly
+      loss_value          money lost on items that came up short (positive number)
+      loss_pct_of_stock   that loss as a % of the shop's expected stock value
+      surplus_value       money "found" on items that came up over
+      unusual_items       lines flagged as statistical anomalies
+      status              green / amber / red, using the same 3% and 5% limits
+    """
+    if df.empty:
+        return pd.DataFrame(columns=SCORECARD_COLUMNS)
+
+    rows = []
+    for shop, grp in df.groupby("location"):
+        items = len(grp)
+        exact = int((grp["qty_variance"] == 0).sum())
+        stock_value = float((grp["expected_qty"] * grp["unit_cost"]).sum())
+        loss = -float(grp.loc[grp["qty_variance"] < 0, "value_variance"].sum())
+        surplus = float(grp.loc[grp["qty_variance"] > 0, "value_variance"].sum())
+        loss_pct = loss / stock_value * 100 if stock_value else 0.0
+        unusual = int(grp["is_anomaly"].sum()) if "is_anomaly" in grp else 0
+        rows.append({
+            "location": shop,
+            "items_counted": items,
+            "count_accuracy_pct": exact / items * 100,
+            "loss_value": loss,
+            "loss_pct_of_stock": loss_pct,
+            "surplus_value": surplus,
+            "unusual_items": unusual,
+            "status": _band(loss_pct, amber, red),
+        })
+    out = pd.DataFrame(rows).sort_values("loss_pct_of_stock", ascending=False)
+    return out.reset_index(drop=True)
+
+
+# --------------------------------------------------------------------------- #
+# Movers & underperformers: what changed between two stock takes
+# --------------------------------------------------------------------------- #
+def period_comparison(df: pd.DataFrame, current_date, previous_date) -> pd.DataFrame:
+    """
+    Compare each product's money difference (value variance) between two
+    stock takes.
+
+      before  = money difference at the earlier stock take
+      now     = money difference at the later stock take
+      change  = now - before
+
+    Money difference is negative when stock is missing, so:
+      change > 0  -> the product got better (smaller loss)
+      change < 0  -> the product got worse (bigger loss)
+    """
+    def total_for(date):
+        return (
+            df[df["count_date"] == date]
+            .groupby(["product_name", "category"])["value_variance"]
+            .sum()
+        )
+
+    out = pd.concat(
+        [total_for(previous_date).rename("before"), total_for(current_date).rename("now")],
+        axis=1,
+    ).fillna(0.0).reset_index()
+    out["change"] = out["now"] - out["before"]
+    return out
+
+
+def movers_and_underperformers(comparison: pd.DataFrame, n: int = 10):
+    """
+    Split a period comparison into:
+      movers         products that improved the most (largest positive change)
+      underperformers products that got worse the most (largest negative change)
+    """
+    movers = (
+        comparison[comparison["change"] > 0]
+        .sort_values("change", ascending=False)
+        .head(n)
+        .reset_index(drop=True)
+    )
+    underperformers = (
+        comparison[comparison["change"] < 0]
+        .sort_values("change")
+        .head(n)
+        .reset_index(drop=True)
+    )
+    return movers, underperformers
+
+
+# --------------------------------------------------------------------------- #
+# Export for Power BI: the data split into a simple star schema
+# --------------------------------------------------------------------------- #
+def powerbi_tables(df: pd.DataFrame) -> dict:
+    """
+    Split the stock-take data into four tidy tables that load straight into
+    Power BI as a star schema:
+
+      fact_stocktake  the numbers, one row per product per shop per count
+      dim_product     one row per product (name, category)
+      dim_shop        one row per shop
+      dim_date        one row per count date (year, month, week)
+
+    The fact table links to the others through the *_key columns.
+    """
+    data = df.copy()
+    data["count_date"] = pd.to_datetime(data["count_date"])
+
+    dim_product = (
+        data[["product_name", "category"]]
+        .drop_duplicates()
+        .sort_values(["category", "product_name"])
+        .reset_index(drop=True)
+    )
+    dim_product.insert(0, "product_key", range(1, len(dim_product) + 1))
+
+    dim_shop = (
+        data[["location"]]
+        .drop_duplicates()
+        .sort_values("location")
+        .reset_index(drop=True)
+        .rename(columns={"location": "shop_name"})
+    )
+    dim_shop.insert(0, "shop_key", range(1, len(dim_shop) + 1))
+
+    dates = data["count_date"].drop_duplicates().sort_values().reset_index(drop=True)
+    dim_date = pd.DataFrame({
+        "date_key": dates.dt.strftime("%Y%m%d").astype(int),
+        "date": dates.dt.date,
+        "year": dates.dt.year,
+        "month_number": dates.dt.month,
+        "month_name": dates.dt.strftime("%B"),
+        "week_number": dates.dt.isocalendar().week.astype(int).values,
+    })
+
+    fact = (
+        data.merge(dim_product, on=["product_name", "category"])
+        .merge(dim_shop, left_on="location", right_on="shop_name")
+    )
+    fact["date_key"] = fact["count_date"].dt.strftime("%Y%m%d").astype(int)
+    fact_cols = ["date_key", "shop_key", "product_key", "sku", "expected_qty",
+                 "counted_qty", "unit_cost", "qty_variance", "value_variance"]
+    if "is_anomaly" in fact:
+        fact_cols.append("is_anomaly")
+    fact_stocktake = fact[fact_cols].reset_index(drop=True)
+
+    return {
+        "fact_stocktake": fact_stocktake,
+        "dim_product": dim_product,
+        "dim_shop": dim_shop,
+        "dim_date": dim_date,
+    }
+
+
+def tables_to_zip(tables: dict) -> bytes:
+    """Pack each table into one CSV file inside a single ZIP download."""
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        for name, table in tables.items():
+            zf.writestr(f"{name}.csv", table.to_csv(index=False))
+    return buffer.getvalue()
