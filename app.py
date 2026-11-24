@@ -21,6 +21,7 @@ from analytics import (
     compute_variance,
     detect_anomalies,
     has_multiple_periods,
+    loss_over_time,
     movers_and_underperformers,
     period_comparison,
     powerbi_tables,
@@ -53,6 +54,12 @@ def EURO0(value):  # whole euros, used in tables
 
 def EURO2(value):  # euros and cents, used in tables
     return euro(value, 2)
+
+
+def date_label(dates: pd.Series) -> pd.Series:
+    """Turn dates into short readable labels such as '1 Jul 2026'."""
+    d = pd.to_datetime(dates)
+    return d.dt.day.astype(str) + " " + d.dt.strftime("%b %Y")
 
 # --------------------------------------------------------------------------- #
 # Page config + styling
@@ -493,45 +500,119 @@ with tab_trends:
         st.info("Trend analysis needs more than one count date in the current view. "
                 "Widen the date filter in the sidebar to compare periods.")
     else:
-        st.subheader("Accuracy over time")
+        st.caption("How things change from one stock take to the next. "
+                   "Each point on the charts is one stock take.")
         trend = accuracy_trend(view)
+        # Show dates as readable labels (e.g. "1 Jul 2026") in time order.
+        trend["label"] = date_label(trend["count_date"])
+        latest, previous = trend.iloc[-1], trend.iloc[-2]
+
+        # --- Latest vs previous stock take, in three cards ---
+        acc_change = latest["accuracy"] - previous["accuracy"]
+        loss_change = latest["loss_value"] - previous["loss_value"]
+        found_change = latest["surplus_value"] - previous["surplus_value"]
+        t1, t2, t3 = st.columns(3)
+        t1.markdown(metric_card(
+            f"Count accuracy ({latest['label']})", f"{latest['accuracy']:.1f}%",
+            f"{acc_change:+.1f} points vs {previous['label']}",
+            accent=GAIN if acc_change >= 0 else LOSS), unsafe_allow_html=True)
+        t2.markdown(metric_card(
+            f"Money lost ({latest['label']})", euro(latest["loss_value"]),
+            f"{'up' if loss_change > 0 else 'down'} {euro(abs(loss_change))} "
+            f"vs {previous['label']}",
+            accent=LOSS if loss_change > 0 else GAIN), unsafe_allow_html=True)
+        t3.markdown(metric_card(
+            f"Surplus found ({latest['label']})", euro(latest["surplus_value"]),
+            f"{'up' if found_change > 0 else 'down'} {euro(abs(found_change))} "
+            f"vs {previous['label']}", accent=BRASS), unsafe_allow_html=True)
+        st.write("")
+
+        # --- Money lost vs surplus found at each stock take ---
+        st.subheader("Money lost vs surplus found")
+        st.caption("**Lost** = value of stock missing at the count. **Found** = value "
+                   "of extra stock found (usually a delivery or counting mistake). "
+                   "The gap between them is the overall result.")
         fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=trend["count_date"], y=trend["accuracy"], mode="lines+markers",
-            line=dict(color=INK, width=3), marker=dict(size=9, color=BRASS),
-            name="Accuracy %",
-        ))
-        fig.update_layout(plot_bgcolor="white", paper_bgcolor="white",
-                          height=320, margin=dict(t=10, b=10, l=10, r=10),
-                          yaxis=dict(title="Count accuracy %"))
+        fig.add_trace(go.Bar(
+            x=trend["label"], y=trend["loss_value"], name="Lost",
+            marker_color=LOSS, text=[euro(v) for v in trend["loss_value"]],
+            textposition="outside"))
+        fig.add_trace(go.Bar(
+            x=trend["label"], y=trend["surplus_value"], name="Found",
+            marker_color=GAIN, text=[euro(v) for v in trend["surplus_value"]],
+            textposition="outside"))
+        fig.update_layout(
+            barmode="group", plot_bgcolor="white", paper_bgcolor="white", height=340,
+            margin=dict(t=30, b=10, l=10, r=10), legend=dict(orientation="h", y=1.12),
+            yaxis=dict(title="€", rangemode="tozero"),
+            xaxis=dict(type="category", title=None))
         st.plotly_chart(fig, use_container_width=True)
 
-        st.subheader("Value at risk over time")
+        # --- Accuracy on a fixed 0 to 100% scale so small moves look small ---
+        st.subheader("Count accuracy at each stock take")
+        st.caption("The share of products where the count matched the system exactly. "
+                   "Higher is better. The scale runs from 0 to 100% so small changes "
+                   "are not exaggerated.")
         fig2 = go.Figure()
-        fig2.add_trace(go.Bar(x=trend["count_date"], y=trend["abs_value_at_risk"],
-                              marker_color=MUTE, name="Absolute value at risk"))
-        fig2.add_trace(go.Scatter(x=trend["count_date"], y=trend["net_value_variance"],
-                                  mode="lines+markers", line=dict(color=LOSS, width=3),
-                                  name="Net value variance"))
-        fig2.update_layout(plot_bgcolor="white", paper_bgcolor="white", height=320,
-                           margin=dict(t=10, b=10, l=10, r=10),
-                           legend=dict(orientation="h", y=-0.2))
+        fig2.add_trace(go.Scatter(
+            x=trend["label"], y=trend["accuracy"], mode="lines+markers+text",
+            line=dict(color=INK, width=3), marker=dict(size=10, color=BRASS),
+            text=[f"{v:.1f}%" for v in trend["accuracy"]], textposition="top center",
+            name="Accuracy"))
+        fig2.update_layout(
+            plot_bgcolor="white", paper_bgcolor="white", height=300,
+            margin=dict(t=10, b=10, l=10, r=10), showlegend=False,
+            yaxis=dict(title="Accuracy %", range=[0, 105]),
+            xaxis=dict(type="category", title=None))
         st.plotly_chart(fig2, use_container_width=True)
 
-        st.subheader("Recurring shortage products")
-        st.caption("Products short across two or more count dates — the strongest "
-                   "signal of genuine shrinkage rather than a one-off miscount.")
+        # --- Where the losses come from over time ---
+        st.subheader("Where the losses come from")
+        split = st.radio("Break down by", ["Category", "Shop"], horizontal=True,
+                         key="trend_split")
+        dim = "category" if split == "Category" else "location"
+        lot = loss_over_time(view, dim)
+        lot["label"] = date_label(lot["count_date"])
+        fig3 = px.line(lot, x="label", y="loss_value", color=dim, markers=True,
+                       labels={"label": "", "loss_value": "Money lost (€)",
+                               dim: split})
+        fig3.update_layout(plot_bgcolor="white", paper_bgcolor="white", height=360,
+                           margin=dict(t=10, b=10, l=10, r=10),
+                           xaxis=dict(type="category"), yaxis=dict(rangemode="tozero"))
+        st.plotly_chart(fig3, use_container_width=True)
+
+        # Plain-words summary of the biggest increase between the last two counts.
+        last_two = lot[lot["count_date"].isin([previous["count_date"], latest["count_date"]])]
+        pivot = last_two.pivot(index=dim, columns="count_date", values="loss_value")
+        pivot["change"] = pivot[latest["count_date"]] - pivot[previous["count_date"]]
+        worst = pivot["change"].idxmax()
+        if pivot.loc[worst, "change"] > 0:
+            st.markdown(
+                f"**In plain words:** between {previous['label']} and {latest['label']}, "
+                f"losses rose most in **{worst}** (up {euro(pivot.loc[worst, 'change'])}). "
+                f"Overall, money lost went {'up' if loss_change > 0 else 'down'} by "
+                f"{euro(abs(loss_change))}."
+            )
+
+        # --- Products that keep coming up short ---
+        st.subheader("Products that keep coming up short")
+        st.caption("Products missing stock at two or more stock takes. A product that "
+                   "is short again and again is a stronger warning sign than a one-off "
+                   "counting mistake.")
         ro = recurring_offenders(view)
         if ro.empty:
-            st.success("No products show recurring shortages in the current view.")
+            st.success("No products show repeated shortages in the current view.")
         else:
-            show = ro.rename(columns={
-                "product_name": "Product", "periods_short": "Periods short",
-                "total_shrinkage_value": "Shrinkage value",
-                "total_units_lost": "Units lost", "locations": "Location(s)",
+            n_counts = view["count_date"].nunique()
+            show = pd.DataFrame({
+                "Product": ro["product_name"],
+                "Short at": ro["periods_short"].map(lambda p: f"{p} of {n_counts} stock takes"),
+                "Money lost": -ro["total_shrinkage_value"],
+                "Units missing": -ro["total_units_lost"],
+                "Shops": ro["locations"],
             })
             st.dataframe(
-                show.style.format({"Shrinkage value": EURO2}),
+                show.style.format({"Money lost": EURO2, "Units missing": "{:,.0f}"}),
                 use_container_width=True, hide_index=True,
             )
 

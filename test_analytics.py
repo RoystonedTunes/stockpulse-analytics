@@ -218,3 +218,25 @@ def test_powerbi_tables_star_schema():
     assert len(t["dim_date"]) == 3
     names = zipfile.ZipFile(io.BytesIO(tables_to_zip(t))).namelist()
     assert sorted(names) == sorted(f"{k}.csv" for k in t)
+
+
+# ---- v4: clearer trends ---------------------------------------------------- #
+
+def test_accuracy_trend_splits_loss_and_surplus():
+    from analytics import compute_variance, accuracy_trend
+    t = accuracy_trend(compute_variance(_multi_period_frame()))
+    # Loss and surplus are positive; net = surplus - loss.
+    assert (t["loss_value"] >= 0).all() and (t["surplus_value"] >= 0).all()
+    assert ((t["surplus_value"] - t["loss_value"]).round(6)
+            == t["net_value_variance"].round(6)).all()
+    assert list(t["count_date"]) == sorted(t["count_date"])
+
+
+def test_loss_over_time_fills_every_group_and_date():
+    from analytics import compute_variance, loss_over_time
+    df = compute_variance(_multi_period_frame())
+    lot = loss_over_time(df, "location")
+    assert len(lot) == df["count_date"].nunique() * df["location"].nunique()
+    assert (lot["loss_value"] >= 0).all()
+    total_loss = -df.loc[df["qty_variance"] < 0, "value_variance"].sum()
+    assert round(lot["loss_value"].sum(), 6) == round(total_loss, 6)

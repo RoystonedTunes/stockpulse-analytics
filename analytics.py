@@ -155,8 +155,14 @@ def has_multiple_periods(df: pd.DataFrame) -> bool:
 
 def accuracy_trend(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Per count_date: accuracy %, net value variance, and absolute value at risk.
-    Sorted chronologically.
+    One row per stock take (count_date), oldest first:
+
+      accuracy            % of product lines where the count matched exactly
+      loss_value          money lost on items that came up short (positive number)
+      surplus_value       money "found" on items that came up over (positive number)
+      net_value_variance  surplus minus loss (negative = overall loss)
+      abs_value_at_risk   loss plus surplus: the total size of all mismatches
+      records             how many product lines were counted
     """
     rows = []
     for date, grp in df.groupby("count_date"):
@@ -164,11 +170,31 @@ def accuracy_trend(df: pd.DataFrame) -> pd.DataFrame:
         rows.append({
             "count_date": date,
             "accuracy": exact / len(grp) * 100 if len(grp) else 0.0,
+            "loss_value": -float(grp.loc[grp["qty_variance"] < 0, "value_variance"].sum()),
+            "surplus_value": float(grp.loc[grp["qty_variance"] > 0, "value_variance"].sum()),
             "net_value_variance": float(grp["value_variance"].sum()),
             "abs_value_at_risk": float(grp["value_variance"].abs().sum()),
             "records": len(grp),
         })
     return pd.DataFrame(rows).sort_values("count_date").reset_index(drop=True)
+
+
+def loss_over_time(df: pd.DataFrame, dimension: str) -> pd.DataFrame:
+    """
+    Money lost on shortages at each stock take, split by `dimension`
+    ("category" or "location"). Loss is a positive number. Every group appears
+    at every date (0 when nothing was lost), so lines don't break.
+    """
+    short = df[df["qty_variance"] < 0]
+    dates = sorted(df["count_date"].unique())
+    groups = sorted(df[dimension].unique())
+    loss = -short.groupby(["count_date", dimension])["value_variance"].sum()
+    full = pd.MultiIndex.from_product([dates, groups], names=["count_date", dimension])
+    return (
+        loss.reindex(full, fill_value=0.0)
+        .rename("loss_value")
+        .reset_index()
+    )
 
 
 def recurring_offenders(df: pd.DataFrame, min_periods: int = 2) -> pd.DataFrame:
